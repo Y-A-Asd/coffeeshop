@@ -152,6 +152,18 @@ class OrderCanceldListView(BaseOrderListView):
         return Order.objects.filter(status='C')
 
 
+class OrderAllListView(BaseOrderListView):
+    def get_queryset(self):
+        return Order.objects.all()
+
+
+class OrderSearchListView(BaseOrderListView):
+    def get_queryset(self):
+        customer_phone = self.request.GET.get('customer_phone')
+        return Order.objects.filter(customer_phone__icontains=customer_phone)
+
+
+
 class ChangeStatusOrderView(StaffSuperuserRequiredMixin, View):
     def post(self, request, pk):
         new_status: str = request.POST.get('new_status')
@@ -163,7 +175,7 @@ class ChangeStatusOrderView(StaffSuperuserRequiredMixin, View):
         order.status = new_status
         order.save()
         messages.success(request, 'Order changed successfully!')
-        return redirect(f'order:list-order-{new_status.lower()}')
+        return redirect('order:list-order')
 
 
 class ListOrderPhoneView(LoginRequiredMixin, CSVExportMixin, View):
