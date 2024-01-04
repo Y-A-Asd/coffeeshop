@@ -70,7 +70,7 @@
                                       clip-rule="evenodd"></path>
                             </svg>
                         </span>
-                        <input type="text" class="form-control" name="customer_phone" placeholder="Search orders">
+                        <input type="text" class="form-control" name="label" placeholder="Search orders">
                     </div>
                 </form>
             </div>
@@ -169,7 +169,7 @@
                                                 Set to Waiting
                                             </button>
                                             <br>
-                                        {% endif %} 
+                                        {% endif %}
                                         {% if not order.status == 'C' %}
                                             <button type="submit" class="btn btn-danger my-2" name="new_status" value="C">
                                                 Set to Canceled

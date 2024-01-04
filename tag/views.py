@@ -7,14 +7,43 @@ from django.views.generic import ListView, CreateView, DeleteView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .forms import TagCreateForm
 from .models import Tag
-from utils import staff_or_superuser_required, StaffSuperuserRequiredMixin
+from utils import staff_or_superuser_required, StaffSuperuserRequiredMixin, CSVExportMixin
 
 
-class TagListView(StaffSuperuserRequiredMixin, ListView):
+class TagListView(CSVExportMixin, StaffSuperuserRequiredMixin, ListView):
     model = Tag
     template_name = 'Tag_ListTemplate.html'
     context_object_name = 'tags'
     paginate_by = 10
+
+    def get_csv_export_queryset(self):
+        return Tag.objects.all().order_by('-label')
+
+
+class TagSearchedListView(CSVExportMixin, StaffSuperuserRequiredMixin, ListView):
+    model = Tag
+    template_name = 'Tag_ListTemplate.html'
+    context_object_name = 'tags'
+    paginate_by = 10
+
+    def get_queryset(self):
+        label = self.request.GET.get('label')
+
+        # Check if label is None before using it in the queryset
+        if label is not None:
+            return Tag.objects.filter(label__icontains=label)
+        else:
+            # Return an empty queryset or the default queryset as needed
+            return Tag.objects.none()  # or Tag.objects.all() if you want to show all tags
+
+    def get_csv_export_queryset(self):
+        label = self.request.GET.get('label')
+
+        # Check if label is None before using it in the queryset
+        if label is not None:
+            return Tag.objects.filter(label__icontains=label).order_by('-label')
+        else:
+            return Tag.objects.none()
 
 
 class CreateTagView(StaffSuperuserRequiredMixin, CreateView):
