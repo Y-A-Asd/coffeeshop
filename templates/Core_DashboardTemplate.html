@@ -57,7 +57,11 @@
                         <h2 class="fs-3 fw-extrabold">${{ total_sales|floatformat }}</h2>
                         <div class="small mt-2">
                             <span class="fw-normal me-2">Diff:</span>
-                            <span class="text-success fw-bold">{{ percentage_difference|floatformat }}%</span>
+                            {% if percentage_difference > 0  %}
+                                <span class="text-success fw-bold">{{ percentage_difference|floatformat }}%</span>
+                            {% else %}
+                                <span class="text-danger fw-bold">{{ percentage_difference|floatformat }}%</span>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="d-flex ms-auto">

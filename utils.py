@@ -486,7 +486,7 @@ class Reporting:
         else:
             percentage_difference = 0
 
-        return percentage_difference
+        return -percentage_difference
 
     def peak_hours(self):  # todo: Dahanam sevice shod :-|
         start_hour = 0
@@ -680,7 +680,7 @@ class Reporting:
 
 
 
-class CSVExportMixin(StaffSuperuserRequiredMixin):
+class CSVExportMixin():
     def dispatch(self, request, *args, **kwargs):
         if 'export_csv' in request.GET:
             queryset = self.get_csv_export_queryset()

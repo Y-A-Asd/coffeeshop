@@ -15,7 +15,6 @@ class ListFoodView(View):
     template_name = 'Food_ListTemplate.html'
     login_url = 'users:login'
 
-    @staff_or_superuser_required
     def get(self, request):
 
         menu_data = json_menu_generator()

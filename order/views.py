@@ -20,7 +20,7 @@ from order.models import OrderItem, Order
 
 
 class CreateCartView(View):
-    @staff_or_superuser_required
+
     def post(self, request, product_id):
         cart = Cart(request)
         product = get_object_or_404(Food, id=product_id)
@@ -47,7 +47,6 @@ class DeleteCartView(View):
 class DetailCartView(View):
     template_name = 'Order_DetailCart.html'
 
-    @staff_or_superuser_required
     def get(self, request):
         cart = Cart(request)
         for item in cart:
@@ -60,7 +59,7 @@ class DetailCartView(View):
 class MakeOrderView(View):
     template_name = 'Order_CreateOrder.html'
 
-    @staff_or_superuser_required
+
     def get(self, request):
         cart = Cart(request)
         form = OrderCreateForm()
@@ -71,7 +70,6 @@ class MakeOrderView(View):
             return redirect('order:detail-cart')
 
 
-    @staff_or_superuser_required
     def post(self, request):
         cart = Cart(request)
         form = OrderCreateForm(request.POST)
@@ -178,7 +176,7 @@ class ChangeStatusOrderView(StaffSuperuserRequiredMixin, View):
         return redirect('order:list-order')
 
 
-class ListOrderPhoneView(LoginRequiredMixin, CSVExportMixin, View):
+class ListOrderPhoneView(CSVExportMixin, View):
     template_name = 'Order_ListPhoneOrder.html'
     paginate_by = 10
 
