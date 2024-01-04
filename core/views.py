@@ -68,3 +68,7 @@ class DashboardView(View):
         }
 
         return render(request, self.template_name, context=context)
+
+
+def about_us(request):
+  return render(request, 'templates/pages/about-us.html')
