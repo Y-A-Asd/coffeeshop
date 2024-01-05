@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from order.models import Order
 from tables.models import Table
 from order.forms import CartAddProductForm, OrderCreateForm
-from foodmenu.models import Food
+from foodmenu.models import Food, Category
 from django.urls import reverse
 
 
@@ -41,12 +41,19 @@ class OrderCreateFormTest(TestCase):
 
 class CreateCartViewTest(TestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        # Create a Category object
+        cls.category = Category.objects.create(id=10, name='Test Category')
+        # Create a Food object with category_id=1
+        cls.product = Food.objects.create(category=cls.category, name='Test Food', price=10.0)
+
     def setUp(self):
         self.client = Client()
-        self.product = Food.objects.create(...)
 
     def test_create_cart_view_post(self):
         response = self.client.post(reverse('order:create-cart', args=[self.product.id]),
                                     {'quantity': 2, 'override': False})
-        self.assertEqual(response.status_code, 302)  # Assuming it redirects after adding to cart
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('order:detail-cart'))

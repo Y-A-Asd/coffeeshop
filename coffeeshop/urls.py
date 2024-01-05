@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('foods/', include('foodmenu.urls', namespace='foods')),
     path('__debug__/', include('debug_toolbar.urls')),
     path('admin/login/', UsersLoginView.as_view(), ),
     path('admin/', admin.site.urls),
@@ -28,7 +29,7 @@ urlpatterns = [
     path('blogs/', include('blog.urls', namespace='blog')),
     path('users/', include('users.urls', namespace='users')),
     path('tables/', include('tables.urls', namespace='tables')),
-    path('foods/', include('foodmenu.urls', namespace='foods')),
+
     path('orders/', include('order.urls', namespace='order')),
     path('tags/', include('tag.urls', namespace='tags')),
 

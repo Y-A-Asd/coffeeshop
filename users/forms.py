@@ -9,7 +9,13 @@ class LoginForm(forms.Form):
             "class": "form-control",
             "id": "phone_number"
         }
-    ))
+    ),validators=[
+            RegexValidator(
+                regex=r'^09\d{9}$',
+                message='Phone number must be in the format 09XXXXXXXXX.',
+                code='invalid_phone_number'
+            )
+        ])
     password = forms.CharField(required=True, widget=forms.PasswordInput(
         attrs={
             "placeholder": "Password",

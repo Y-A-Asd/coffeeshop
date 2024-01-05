@@ -78,7 +78,7 @@ class UpdateFoodView(View):
     @staff_or_superuser_required
     def post(self, request, pk):
         food_object = Food.objects.get(pk=pk)
-        form = FoodCreateForm(request.POST, instance=food_object)
+        form = FoodCreateForm(request.POST, request.FILES, instance=food_object)
         if form.is_valid():
             food = form.save()
             TaggedItem.objects.filter(
@@ -91,7 +91,7 @@ class UpdateFoodView(View):
             messages.success(request, 'Food updated successfully!')
             return redirect('foods:list-food')
 
-        return render(request, 'category_form.html', {'form': form})
+        return render(request, self.template_name, {'form': form})
 
 
 class UpdateCategoryView(View):

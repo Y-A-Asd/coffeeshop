@@ -37,7 +37,7 @@ class UsersLoginView(View):
                 return redirect('users:login')
         else:
             messages.error(request, 'Invalid Data')
-            return redirect('users:login')
+            return render(request, self.template_name, {'form': form})
 
 
 class UsersAuthCodeView(View):

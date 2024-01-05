@@ -1,7 +1,9 @@
 from django.test import TestCase
 from tag.forms import TagCreateForm
 from tag.models import Tag, TaggedItem
-from foodmenu.models import Food
+from foodmenu.models import Food, Category
+
+
 class TagModelTest(TestCase):
 
     @classmethod

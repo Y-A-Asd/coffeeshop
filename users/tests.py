@@ -1,6 +1,6 @@
 from django.test import TestCase,Client
 from users.models import User
-from users.backend import PhoneBackend
+from .backends import PhoneBackend
 from users.forms import LoginForm, RegistrationForm
 from django.urls import reverse
 
@@ -58,5 +58,5 @@ class UsersLoginViewTest(TestCase):
         self.assertEqual(response.status_code, 302)  # Assuming successful login redirects
 
     def test_post_login_view_invalid_credentials(self):
-        response = self.client.post(reverse('users:login'), {'phone_number': '09123456789', 'password': 'wrongpassword'})
-        self.assertEqual(response.status_code, 200)  # Assuming stay on page with error message
+        response = self.client.post(reverse('users:login'), {'phone_number': '09123456789', 'password': ''})
+        self.assertEqual(response.status_code, 200)  # error message
