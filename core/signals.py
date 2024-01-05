@@ -77,6 +77,7 @@ def log_create_update(sender, instance, created, **kwargs):
     |                                                                                                   |
     """                                                                                               """"""
     # refrence is up here
+    request = None
     for frame_record in inspect.stack():
         if frame_record[3] == 'get_response':
             request = frame_record[0].f_locals['request']
@@ -84,7 +85,10 @@ def log_create_update(sender, instance, created, **kwargs):
             """https://www.geeksforgeeks.org/inspect-module-in-python/"""
             break
 
-    user = request.user
+    if request:
+        user = request.user
+    else:
+        user = None
 
     AuditLog.objects.create(
         user=user,
@@ -115,6 +119,7 @@ def log_delete(sender, instance, **kwargs):
     |                                                                                                   |
     """                                                                                               """"""
     # refrence is up here
+    request = None
     for frame_record in inspect.stack():
         if frame_record[3] == 'get_response':
             request = frame_record[0].f_locals['request']
@@ -122,7 +127,9 @@ def log_delete(sender, instance, **kwargs):
             """https://www.geeksforgeeks.org/inspect-module-in-python/"""
             break
 
-    user = request.user
+    if request:
+        user = request.user
+    else: user = None
 
     old_value = serialize_model_instance(instance)
 

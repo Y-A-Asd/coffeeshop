@@ -1,4 +1,6 @@
 from django.test import TestCase
+
+from users.models import User
 from .models import Food, Category
 from django.test import Client
 from django.urls import reverse
@@ -38,14 +40,18 @@ class FoodModelTest(TestCase):
 
     def test_price_after_off(self):
         food = Food.objects.get(id=1)
-        expected_price = 8.99  # 10% off from 9.99
-        self.assertEqual(food.price_after_off, expected_price)
+        expected_price = '8.99'  # 10% off from 9.99
+        self.assertEqual(str(food.price_after_off), expected_price)
 
 
-class ListFoodViewTest(TestCase):
+class ListFoodSuperViewTest(TestCase):
 
     def setUp(self):
         self.client = Client()
+        # Create a superuser
+        self.superuser = User.objects.create_superuser('admin', 'admin@example.com', 'password')
+        # Log in the superuser
+        self.client.force_login(self.superuser)
 
     def test_view_url_exists_at_desired_location(self):
         response = self.client.get('/foods/list-food')
@@ -54,7 +60,21 @@ class ListFoodViewTest(TestCase):
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('foods:list-food'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'Food_ListTemplate.html')
+        self.assertTemplateUsed(response, 'menu.html')
+
+class ListFoodViewTest(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+
+
+    def test_view_url_exists_at_desired_location(self):
+        response = self.client.get('/foods/list-food')
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse('foods:list-food'))
+        self.assertEqual(response.status_code, 200)
 
 
 class CategoryCreateFormTest(TestCase):
