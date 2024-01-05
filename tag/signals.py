@@ -69,10 +69,14 @@ In Django, signals are based on the Observer design pattern.
 @receiver(post_delete, sender=TaggedItem)
 def handle_taggeditem_generated(sender, instance, **kwargs):
     try:
+        print('In Try')
         taggeditem = TaggedItem.objects.get(pk=instance.pk)
+        print(taggeditem)
         tag_id = taggeditem.tag_id
+        print(tag_id)
         update_food_availability(tag_id)
     except TaggedItem.DoesNotExist:
+        print('in except')
         Food.objects.update(availability=True)
         unavailable_tags = TaggedItem.objects.get_unavailable_tags(Food)
         content_type = ContentType.objects.get_for_model(Food)
