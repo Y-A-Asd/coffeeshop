@@ -53,8 +53,8 @@
 
 </head>
 <body>
+<nav class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pe-2 pb-0">
 {% if user.is_authenticated %}
-    <nav class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pe-2 pb-0">
         <div class="container-fluid px-0 mx-5">
             <div class="d-flex justify-content-between w-100" id="navbarSupportedContent">
                 <div class="d-flex align-items-center">
@@ -132,9 +132,9 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    
 {% else %}
-    <div class="d-inline-flex end-0">
+    <div class="d-inline-flex end-0 my-5">
         <a class="nav-link dropdown-toggle pt-1 px-0" href="{% url 'users:register' %}">
             <div class="media d-flex align-items-center">
                 <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
@@ -158,7 +158,7 @@
     </div>
 
 {% endif %}
-
+</nav>
 
 
 
