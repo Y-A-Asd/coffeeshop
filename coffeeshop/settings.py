@@ -54,7 +54,12 @@ INSTALLED_APPS = [
     'tables',
     'users',
     'widget_tweaks',
+    # 'django_nose',
 ]
+
+"""https://django-testing-docs.readthedocs.io/en/latest/coverage.html"""
+
+
 
 MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
@@ -158,3 +163,11 @@ TABLE_NUMBER = 10
 AUTH_USER_MODEL = 'users.User'
 
 CART_SESSION_ID = 'cart'
+
+
+# TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+#
+# NOSE_ARGS = [
+#     '--with-coverage',
+#     '--cover-package=blog,core,foodmenu,tag,order,tables,users',
+# ]
