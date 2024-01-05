@@ -29,12 +29,12 @@ class GroupInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     # admin.site.unregister(User)
-    list_display = ('phone_number', 'email','is_active', 'is_staff', 'last_login')#todo : add super user
+    list_display = ('phone_number', 'email','is_active', 'is_staff', 'is_superuser', 'last_login')
     readonly_fields = ('last_login', 'phone_number','email')
 
     fieldsets = (
         (None, {'fields': ['phone_number', 'email']}),
-        ('Permissions', {'fields': ['is_active', 'is_staff', 'groups', 'user_permissions']}),
+        ('Permissions', {'fields': ['is_superuser', 'is_active', 'is_staff', 'groups', 'user_permissions']}),
         ('Last_login', {'fields': ['last_login',]}),
     )
 

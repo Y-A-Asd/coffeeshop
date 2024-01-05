@@ -7,7 +7,7 @@
         <header>
   <nav class="navbar navbar-expand-lg navbar-dark navbar-absolute bg-transparent shadow-none">
     <div class="container">
-      <a class="navbar-brand text-white" href="javascript:;">G3-M</a>
+      <a class="navbar-brand text-white" href=";">G3-M</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-header-2" aria-controls="navbar-header-2" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -30,7 +30,12 @@
           </li>
           <li class="nav-item">
             <a class="nav-link text-white" href="{% url 'core:dashboard' %}">
-              Staff Panel
+              Dashboard
+            </a>
+          </li>
+            <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'foods:list-food' %}">
+              Menu
             </a>
           </li>
         </ul>
@@ -59,7 +64,8 @@
           <p class="text-white opacity-8 lead pe-5 me-5">Feel It With Us !</p>
           <div class="buttons">
               <button type="button" class="btn btn-white mt-4"><a href="{% url 'foods:list-food' %}">Order Now</a></button>
-              <button type="button" class="btn mt-4 "><a class="btn text-white  " href="{% url 'tables:create-reservation' %}">Book a Table</a></button>
+              <button type="button" class="btn btn-white mt-4"><a href="{% url 'tables:create-reservation' %}">Book a Table</a></button>
+{#              <button type="button" class="btn mt-4 "><a class="btn text-white  " href="{% url 'tables:create-reservation' %}">Book a Table</a></button>#}
           </div>
         </div>
       </div>
