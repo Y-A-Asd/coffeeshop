@@ -45,22 +45,21 @@ class CreateCategoryView(View):
 class CreateFoodView(View):
     template_name = 'Food_CreateFoodTemplate.html'
 
-    @staff_or_superuser_required
     def get(self, request):
         form = FoodCreateForm()
         return render(request, self.template_name, {'form': form})
 
-    @staff_or_superuser_required
     def post(self, request):
-        form = FoodCreateForm(request.POST)
+        form = FoodCreateForm(request.POST, request.FILES)
         if form.is_valid():
             food = form.save()
+            print("Food Image URL:", food.foodimage.url)
             tags = form.cleaned_data.get('tags')
             for tag in tags:
                 TaggedItem.objects.create(tag=tag, content_object=food)
 
-        messages.success(request, 'Food created successfully!')
-        return redirect('foods:list-food')
+            messages.success(request, 'Food created successfully!')
+            return redirect('foods:list-food')
 
         return render(request, self.template_name, {'form': form})
 

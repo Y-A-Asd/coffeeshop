@@ -103,6 +103,7 @@ You can use the Prefetch object to further control the prefetch operation.
 
         for food in category.food_set.all():
             category_data['foods'].append({
+                'foodimage':food.foodimage,
                 'id': food.id,
                 'name': food.name,
                 'original_price': food.price,
@@ -121,6 +122,7 @@ You can use the Prefetch object to further control the prefetch operation.
 
             for food in subcategory.food_set.all():
                 subcategory_data['foods'].append({
+                    'foodimage': food.foodimage,
                     'id': food.id,
                     'name': food.name,
                     'original_price': food.price,
