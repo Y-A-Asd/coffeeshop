@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.apps import apps
-
+from django.forms.widgets import ClearableFileInput
 from tag.models import Tag
 from .models import Category, Food
 
@@ -26,10 +26,10 @@ class FoodCreateForm(forms.ModelForm):
 
     off = forms.IntegerField(max_value=100, min_value=0, widget=forms.TextInput(attrs={'class': 'form-control'}))
     price = forms.DecimalField(max_value=10000, min_value=0,widget=forms.TextInput(attrs={'class': 'form-control'}))
-
+    foodimage = forms.ImageField(widget=ClearableFileInput(attrs={'class': 'form-control'}))
     class Meta:
         model = Food
-        fields = ['name', 'price', 'off', 'category', 'tags']
+        fields = ['foodimage','name', 'price', 'off', 'category', 'tags']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'btn btn-info'}),
