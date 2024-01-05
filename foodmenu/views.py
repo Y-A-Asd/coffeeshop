@@ -12,7 +12,7 @@ from django.db.models.deletion import ProtectedError
 
 
 class ListFoodView(View):
-    template_name = 'Food_ListTemplate.html'
+    template_name = 'menu.html'
     login_url = 'users:login'
 
     def get(self, request):

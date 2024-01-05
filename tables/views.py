@@ -17,12 +17,10 @@ from django.views.generic import ListView, DeleteView
 class CreateReservationView(View):
     template_name = 'Reservation_CreateTemplate.html'
 
-    @staff_or_superuser_required
     def get(self, request):
         form = ReservationForm()
         return render(request, self.template_name, {'form': form})
 
-    @staff_or_superuser_required
     def post(self, request):
         form = ReservationForm(request.POST)
         if form.is_valid():
