@@ -15,9 +15,7 @@ This project aims to create a fully functional web application for a cafe in Teh
 3. [Usage](#usage)
    - [Customer Features](#customer-features)
    - [Staff Features](#staff-features)
-4. [Contributing](#contributing)
-5. [License](#license)
-6. [Acknowledgements](#acknowledgements)
+4[License](#license)
 
 ## Project Description
 
