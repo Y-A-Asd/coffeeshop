@@ -12,5 +12,7 @@ urlpatterns = [
     path('create-category', views.CreateCategoryView.as_view(), name='create-category'),
     path('get_food_items/', views.get_food_items, name='get_food_items'),
     path('list-all-food/', views.AllListView.as_view(), name='list-all-food'),
+    path('list-all-food/<int:category_id>', views.CategoryFoodsListView.as_view(), name='list-category-food'),
     path('list-all-food-un/', views.UnListView.as_view(), name='list-all-food-un'),
+    path('list-category/', views.CategoryAllView.as_view(), name='list-category'),
 ]

@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import ListView
 
@@ -154,7 +154,7 @@ def get_food_items(request):
     return JsonResponse({'food_items': None})
 
 
-class AllListView(ListView,StaffSuperuserRequiredMixin, CSVExportMixin):
+class AllListView(CSVExportMixin,StaffSuperuserRequiredMixin,ListView ):
     model = Food
     template_name = 'Food_ListUnTemplate.html'
     context_object_name = 'foods'
@@ -162,8 +162,29 @@ class AllListView(ListView,StaffSuperuserRequiredMixin, CSVExportMixin):
     paginate_by = 10
 
     def get_queryset(self):
-        return Food.objects.all()
+        return Food.objects.all().select_related('category')
+
+    def get_csv_export_queryset(self):
+        return self.get_queryset()
+
+    def get_csv_export_filename(self):
+        return 'foods_export'
 
 class UnListView(AllListView):
     def get_queryset(self):
-        return Food.objects.filter(availability=False)
+        return Food.objects.filter(availability=False).select_related('category')
+
+class CategoryFoodsListView(AllListView):
+    def get_queryset(self):
+        category_id = self.kwargs['category_id']
+        category = get_object_or_404(Category, id=category_id)
+        return Food.objects.filter(category=category).select_related('category')
+
+class CategoryAllView(StaffSuperuserRequiredMixin,ListView):
+    model = Category
+    template_name = 'Food_CategoryListTemplate.html'
+    context_object_name = 'categories'
+    ordering = ['-created_at']
+    paginate_by = 10
+    def get_queryset(self):
+        return Category.objects.all().prefetch_related('parent')

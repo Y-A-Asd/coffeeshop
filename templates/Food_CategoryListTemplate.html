@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Food-List {% endblock %}
+{% block title %} Category-List {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -24,22 +24,10 @@
                     </li>
                 </ol>
             </nav>
-            <h2 class="h4">All Foods</h2>
+            <h2 class="h4">All Categories</h2>
         </div>
     <div class="btn-toolbar mb-2 mb-md-0">
-         <div class="btn-group ms-2 me-2 ms-lg-3">
-                <a href="{% url 'foods:list-category' %}" type="button" class="btn btn-sm btn-twitch text-white">All Categoies</a>
-            </div>
-        <div class="btn-group ms-2 me-2 ms-lg-3">
-                <a href="{% url 'foods:list-all-food' %}" type="button" class="btn btn-sm btn-success text-white">All Foods</a>
-            </div>
-        <div class="btn-group ms-2 me-2 ms-lg-3">
-                <a href="{% url 'foods:list-all-food-un' %}" type="button" class="btn btn-sm btn-danger text-white">Unavailable Foods</a>
-            </div>
-                <form method="get" class="ms-2 me-2 ms-lg-3" action="">
-                    <input type="hidden" name="export_csv" value="1">
-                    <button type="submit" class="btn btn-outline-gray-800">Export</button>
-                </form>
+
             </div>
     </div>
     <div class="mx-7">
@@ -101,39 +89,26 @@
 
             <thead>
             <tr>
-                <th class="border-gray-200">Image</th>
                 <th class="border-gray-200">Name</th>
-                <th class="border-gray-200">Price</th>
-                <th class="border-gray-200">Off</th>
-                <th class="border-gray-200">Total</th>
-                <th class="border-gray-200">Category</th>
-                <th class="border-gray-200">Availability</th>
+                <th class="border-gray-200">Parent</th>
+                <th class="border-gray-200">Foods</th>
+
 
             </tr>
             </thead>
             <tbody>
             <!-- Item -->
-            {% for food in foods %}
+            {% for category in categories %}
                 <tr>
 
-                    <td>
-                        <div style="width: 3rem; border-radius: 1000px;">
-                        <img class="menu-img img img" src="/media/{{ food.foodimage }}"></img>
-                        </div>
-                    </td>
-                    <td><a href="{% url 'foods:update-food' food.id %}">
-                        {{ food.name }}
+
+                    <td><a href="{% url 'foods:update-category' category.id %}">
+                        {{ category.name }}
                         </a>
                     </td>
-                    <td><span class="fw-normal">{{ food.price|floatformat }}</span></td>
-                    <td><span class="fw-normal">{{ food.off }}</span></td>
-                    <td><span class="fw-normal">{{ food.price_after_off }}</span></td>
-                    <td><span class="fw-normal"><a href="{% url 'foods:update-category' food.category.id %}">{{ food.category.name }}</a></span></td>
-                    {% if food.availability %}
-                        <td><span class="fw-normal btn btn-info">{{ food.availability }}</span></td>
-                    {% else %}
-                        <td><span class="fw-normal btn btn-reddit">{{ food.availability }}</span></td>
-                    {% endif %}
+                    <td><span class="fw-normal">{{ category.parent.name }}</span></td>
+                    <td><span class="fw-normal btn btn-warning"><a href="{% url 'foods:list-category-food' category.id %}">Foods</a></span></td>
+                    
 
                 </tr>
 
