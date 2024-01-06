@@ -38,6 +38,25 @@
               Menu
             </a>
           </li>
+            {% if user.is_authenticated %}
+       <li class="nav-item">
+            <a class="nav-link text-rose" href="{% url 'users:logout' %}">
+              Logout
+            </a>
+          </li>
+            {% else %}
+             <li class="nav-item">
+            <a class="nav-link text-rose" href="{% url 'users:login' %}">
+              Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-rose" href="{% url 'users:register' %}">
+              Register
+            </a>
+          </li>
+            {% endif %}
+            
         </ul>
 
         <ul class="nav navbar-nav">

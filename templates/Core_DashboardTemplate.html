@@ -570,13 +570,18 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'foods:list-food' %}">
+                                <a class="nav-link" href="{% url 'foods:list-all-food' %}">
                                     <span class="sidebar-text">Foods List</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'tags:tag' %}">
                                     <span class="sidebar-text">Tags List</span>
+                                </a>
+                            </li> 
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'foods:list-food' %}">
+                                    <span class="sidebar-text">Menu</span>
                                 </a>
                             </li>
                         </ul>

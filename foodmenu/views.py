@@ -3,10 +3,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views import View
+from django.views.generic import ListView
+
 from order.forms import CartAddProductForm
 from tag.models import TaggedItem
 from .forms import CategoryCreateForm, FoodCreateForm
-from utils import json_menu_generator, staff_or_superuser_required
+from utils import json_menu_generator, staff_or_superuser_required, StaffSuperuserRequiredMixin, CSVExportMixin
 from .models import Food, Category
 from django.db.models.deletion import ProtectedError
 
@@ -150,3 +152,18 @@ def get_food_items(request):
         food_list = [{'id': food.id, 'name': food.name} for food in food_items]
         return JsonResponse({'food_items': food_list})
     return JsonResponse({'food_items': None})
+
+
+class AllListView(ListView,StaffSuperuserRequiredMixin, CSVExportMixin):
+    model = Food
+    template_name = 'Food_ListUnTemplate.html'
+    context_object_name = 'foods'
+    ordering = ['-created_at']
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Food.objects.all()
+
+class UnListView(AllListView):
+    def get_queryset(self):
+        return Food.objects.filter(availability=False)
