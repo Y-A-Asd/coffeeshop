@@ -1,4 +1,4 @@
-# Maktab102 CafeShop Adventure
+# Maktab102 CafeShop G3
 
 🌟 Welcome to Maktab102 CafeShop Adventure: The Quest for the Ultimate Django Fullstack Project! 🌟
 
@@ -21,41 +21,97 @@ This project aims to create a fully functional web application for a cafe in Teh
 
 ## Project Description
 
-Include a brief description of your project, its purpose, and the problems it aims to solve.
+This Django project is designed to provide a comprehensive solution for managing a cafe, including customer interactions and staff management.
 
 ## Getting Started
 
-Provide instructions on how to set up the project locally.
+To run the project locally, follow these steps:
 
 ### Prerequisites
 
-List any software, tools, or dependencies that need to be installed before running the project.
+- Python 3.x
+- Django
+- Other dependencies...
 
 ### Installation
 
-Step-by-step instructions on how to install and configure the project.
+1. Clone the repository:
 
-## Usage
+   ```bash
+   git clone https://github.com/group3-maktab/coffeshop.git
+   ```
+   Navigate to the project directory:
 
-Explain how users can interact with your application.
+   ```bash
+   cd coffeeshop
+   ```
+   
+   Install dependencies:
 
-### Customer Features
+   ```bash
+   pip install -r requirements.txt
+   ```
+   Apply migrations:
+   
+   ```bash
+   python manage.py migrate
+   ```
 
-Describe features available to customers, e.g., browsing the menu, placing orders, etc.
+   Run the development server:
+   
+   ```bash
+   python manage.py runserver
+   ```
+   The project will be accessible at http://localhost:8000/.
 
-### Staff Features
 
-Detail features available to staff members, e.g., managing orders, viewing analytics.
+### Usage
 
-## Contributing
+#### Customer Features
 
-Explain how others can contribute to your project. Include guidelines for bug reporting, feature requests, and code contributions.
+- **Browse Menu:** View the cafe's menu and see available items.
+- **Place Orders:** Add items to the cart and place orders.
+- **Earn Rewards:** Earn rewards for frequent visits.
 
-## License
+#### Staff Features
 
-Specify the license under which your project is released.
+- **Manage Orders:** Staff members can manage incoming orders.
+- **View Analytics:** Access sales analytics for better decision-making.
+- **Update Menu:** Add, edit, or remove items from the menu.
 
-## Acknowledgements
+[//]: # (### Contributing)
 
-Mention any resources, tools, or libraries you used and give credit to their creators.
+[//]: # ()
+[//]: # (We welcome contributions! To contribute to the project:)
 
+[//]: # ()
+[//]: # (1. Fork the repository.)
+
+[//]: # (2. Create a new branch: `git checkout -b feature/your-feature`.)
+
+[//]: # (3. Commit your changes: `git commit -m 'Add some feature'`.)
+
+[//]: # (4. Push to the branch: `git push origin feature/your-feature`.)
+
+[//]: # (5. Submit a pull request.)
+
+[//]: # ()
+[//]: # (For bug reports, feature requests, or other inquiries, please open an issue.)
+
+### License
+
+This project is provided under the terms of the Custom Project License (CPL).
+
+You are free to:
+- Use this project for educational and non-commercial purposes.
+- Modify the code for personal or non-commercial use.
+
+You are not allowed to:
+- Use this project or its code for any commercial purposes without explicit permission from the project author.
+
+If you would like to use this project for commercial purposes, please contact the project author to discuss licensing options.
+
+This project is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+© [2023] [G3-M]

@@ -36,7 +36,8 @@ class ReportingTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        food = Food.objects.create(name="Test Food", price=100)
+        category = Category.objects.create(name="Parent Category")
+        food = Food.objects.create(name="Test Food", price=100, category=category)
         table = Table.objects.create(number=1)
         order = Order.objects.create(table=table, status='F')
         OrderItem.objects.create(order=order, product=food, price=food.price, quantity=2)

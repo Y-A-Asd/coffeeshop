@@ -7,6 +7,12 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 
+"""
+    source :
+    https://www.freecodecamp.org/news/sphinx-for-django-documentation-2454e924b3bc/
+    https://docs.djangoproject.com/en/dev/internals/contributing/writing-documentation/
+"""
+
 import os
 import sys
 import django
