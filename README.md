@@ -15,7 +15,7 @@ This project aims to create a fully functional web application for a cafe in Teh
 3. [Usage](#usage)
    - [Customer Features](#customer-features)
    - [Staff Features](#staff-features)
-4[License](#license)
+4. [License](#license)
 
 ## Project Description
 
@@ -69,32 +69,13 @@ To run the project locally, follow these steps:
 
 - **Browse Menu:** View the cafe's menu and see available items.
 - **Place Orders:** Add items to the cart and place orders.
-- **Earn Rewards:** Earn rewards for frequent visits.
+- **Reviews and Reserve:** Users can do reviews of foods and book a table.
 
 #### Staff Features
 
 - **Manage Orders:** Staff members can manage incoming orders.
 - **View Analytics:** Access sales analytics for better decision-making.
 - **Update Menu:** Add, edit, or remove items from the menu.
-
-[//]: # (### Contributing)
-
-[//]: # ()
-[//]: # (We welcome contributions! To contribute to the project:)
-
-[//]: # ()
-[//]: # (1. Fork the repository.)
-
-[//]: # (2. Create a new branch: `git checkout -b feature/your-feature`.)
-
-[//]: # (3. Commit your changes: `git commit -m 'Add some feature'`.)
-
-[//]: # (4. Push to the branch: `git push origin feature/your-feature`.)
-
-[//]: # (5. Submit a pull request.)
-
-[//]: # ()
-[//]: # (For bug reports, feature requests, or other inquiries, please open an issue.)
 
 ### License
 
