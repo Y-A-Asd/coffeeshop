@@ -2,9 +2,10 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 from django.apps import apps
+from django.core.validators import RegexValidator
 from django.forms.widgets import ClearableFileInput
 from tag.models import Tag
-from .models import Category, Food
+from .models import Category, Food, Review
 
 
 class CategoryCreateForm(forms.ModelForm):
@@ -34,3 +35,34 @@ class FoodCreateForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'btn btn-info'}),
         }
+
+
+class ReviewForm(forms.ModelForm):
+    phone_number = forms.CharField(
+        max_length=11,
+        required=True,
+        widget=forms.TextInput(attrs={
+            "placeholder": "Phone",
+            "class": "form-control",
+            "id": "phone_number"
+        }),
+        validators=[
+            RegexValidator(
+                regex=r'^09\d{9}$',
+                message='Phone number must be in the format 09XXXXXXXXX.',
+                code='invalid_phone_number'
+            )
+        ]
+    )
+
+    rating = forms.IntegerField(
+        max_value=5,
+        min_value=0,
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    comment = forms.TextInput(attrs={'class': 'form-control'})
+
+    class Meta:
+        model = Review
+        fields = ['phone_number', 'rating', 'comment']

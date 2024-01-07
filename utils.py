@@ -24,7 +24,7 @@ from django.utils import timezone
 import random
 import os
 from twilio.rest import Client
-from foodmenu.models import Category, Food
+from foodmenu.models import Category, Food, Review
 from order.models import Order, OrderItem
 
 
@@ -102,6 +102,13 @@ You can use the Prefetch object to further control the prefetch operation.
         }
 
         for food in category.food_set.all():
+            reviews: Review=Review.objects.filter(food=food, is_approved=True)
+            average_rating = sum(rate.rating  for rate in reviews)
+            reviews_count = len(reviews) or 0
+            try:
+                average_rating = average_rating / reviews_count
+            except ZeroDivisionError:
+                average_rating = 0
             category_data['foods'].append({
                 'foodimage':food.foodimage,
                 'id': food.id,
@@ -109,6 +116,8 @@ You can use the Prefetch object to further control the prefetch operation.
                 'original_price': food.price,
                 'off_percent': food.off,
                 'price_after_off': food.price_after_off,
+                'average_rating':average_rating,
+                'reviews_count':reviews_count
             })
 
         for subcategory in category.subcategories.all():
@@ -121,6 +130,13 @@ You can use the Prefetch object to further control the prefetch operation.
             }
 
             for food in subcategory.food_set.all():
+                reviews: Review = Review.objects.filter(food=food, is_approved=True)
+                average_rating = sum(rate.rating for rate in reviews)
+                reviews_count = len(reviews) or 0
+                try:
+                    average_rating = average_rating / reviews_count
+                except ZeroDivisionError:
+                    average_rating = 0
                 subcategory_data['foods'].append({
                     'foodimage': food.foodimage,
                     'id': food.id,
@@ -128,6 +144,8 @@ You can use the Prefetch object to further control the prefetch operation.
                     'original_price': food.price,
                     'off_percent': food.off,
                     'price_after_off': food.price_after_off,
+                    'average_rating': average_rating,
+                    'reviews_count': reviews_count
                 })
             category_data['subcategories'].append(subcategory_data)
         menu.append(category_data)
@@ -284,7 +302,7 @@ class Cart:
         """
         Initialize the cart.
         """
-        self.session = request.session  # todo expire at 30 M
+        self.session = request.session
         cart = self.session.get(settings.CART_SESSION_ID)
         if not cart:
             cart = self.session[settings.CART_SESSION_ID] = {}

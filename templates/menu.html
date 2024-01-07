@@ -83,52 +83,56 @@
             {% endif %}
 			<div class="row">
                 {% for category in menu_data %}
-				<div class="col-md-6 col-lg-4">
-					<div class="menu-wrap">
-						<div class="heading-menu text-center ftco-animate">
-							<h3>{{ category.name }}</h3>
-                            {% if user.is_staff or user.is_superuser %}
-                                <a href="{% url 'foods:update-category' category.id %}">Update category</a>
-                            {% endif %}
-						</div>
-                        {% if category.foods %}
-                            {% for food in category.foods %}
-						<div class="menus d-flex ftco-animate">
-							<div class="menu-img img" style="background-image: url(/media/{{ food.foodimage }});"></div>
-							<div class="text">
-								<div class="d-flex">
-									<div class="one-half">
-										<h3>{{ food.name }}</h3>
-									</div>
-									<div class="one-forth">
-										{% if food.off_percent %}
-                                            <span class="price line-through">{{ food.original_price }}</span>
-                                            <br>
-                                            <span class=" line-through">{{ food.off_percent }}%</span>
-                                            <br>
-                                            <span class="price line-through">{{ food.price_after_off }}</span>
-                                        {% else %}
-                                            <span class="price line-through">{{ food.original_price }}</span>
-                                        {% endif %}
-									</div>
-                               
-								</div>
-                             {% if user.is_staff or user.is_superuser %}
-                                    <a href="{% url 'foods:update-food' food.id %}">Update food</a>
-                                {% endif %}
-                                    <form action="{% url 'order:create-cart' food.id %}" method="post">
-                                        {% csrf_token %}
-                                        {{ cart_prodict_form.as_p }}
-                                        <input class="form-control" type="submit" value="Add to cart">
-                                    </form>
-							</div>
-						</div>{% endfor %}
-                                {% endif %}
+    <div class="col-md-6 col-lg-4">
+        <div class="menu-wrap">
+            <div class="heading-menu text-center ftco-animate">
+                <h3>{{ category.name }}</h3>
+                {% if user.is_staff or user.is_superuser %}
+                    <a href="{% url 'foods:update-category' category.id %}">Update category</a>
+                {% endif %}
+            </div>
 
-						<span class="flat flaticon-bread" style="left: 0;"></span>
-						<span class="flat flaticon-breakfast" style="right: 0;"></span>
-					</div>
-				</div>
+            {% if category.foods %}
+                {% for food in category.foods %}
+                    <div class="menus d-flex ftco-animate">
+                        <div class="menu-img img" style="background-image: url(/media/{{ food.foodimage }});"></div>
+                        <div class="text">
+                            <div class="d-flex">
+                                <div class="one-half">
+                                    <h3>{{ food.name }}</h3><p class="">
+								<a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
+                                    <p>Rating: {{ food.average_rating }} </p>
+                                        <a href="{% url 'foods:submit-review' food.id %}">Submit Review
+                                        </a> 
+                                </div>
+                                <div class="one-forth">
+                                    {% if food.off_percent %}
+                                        <span class="">{{ food.original_price }}</span>
+                                        <br>
+                                        <p class="">{{ food.off_percent }}%</p>
+                                        <span class="price line-through">{{ food.price_after_off }}</span>
+                                    {% else %}
+                                        <span class="price line-through">{{ food.original_price }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if user.is_staff or user.is_superuser %}
+                                <a href="{% url 'foods:update-food' food.id %}">Update food</a>
+                            {% endif %}
+                            <form action="{% url 'order:create-cart' food.id %}" method="post">
+                                {% csrf_token %}
+                                {{ cart_prodict_form.as_p }}
+                                <input class="form-control" type="submit" value="Add to cart">
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <span class="flat flaticon-bread" style="left: 0;"></span>
+            <span class="flat flaticon-breakfast" style="right: 0;"></span>
+        </div>
+    </div>
                 {% for subcategory in category.subcategories %}
                     {% if subcategory.foods %}
 				<div class="col-md-6 col-lg-4">
@@ -146,13 +150,17 @@
 								<div class="d-flex">
 									<div class="one-half">
 										<h3>{{ food.name }}</h3>
+                                        <p class="">
+								<a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
+                                    <p>Rating: {{ food.average_rating }} </p>
+                                        <a href="{% url 'foods:submit-review' food.id %}">Submit Review
+                                        </a>
 									</div>
 									<div class="one-forth">
 										{% if food.off_percent %}
-                                            <span class="price line-through">{{ food.original_price }}</span>
+                                            <span class="">{{ food.original_price }}</span>
                                             <br>
-                                            <span class=" line-through">{{ food.off_percent }}%</span>
-                                            <br>
+                                            <p class="">{{ food.off_percent }}%</p>
                                             <span class="price line-through">{{ food.price_after_off }}</span>
                                         {% else %}
                                             <span class="price line-through">{{ food.original_price }}</span>

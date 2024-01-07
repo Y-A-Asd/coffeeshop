@@ -1,5 +1,7 @@
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
@@ -7,9 +9,9 @@ from django.views.generic import ListView
 
 from order.forms import CartAddProductForm
 from tag.models import TaggedItem
-from .forms import CategoryCreateForm, FoodCreateForm
+from .forms import CategoryCreateForm, FoodCreateForm, ReviewForm
 from utils import json_menu_generator, staff_or_superuser_required, StaffSuperuserRequiredMixin, CSVExportMixin
-from .models import Food, Category
+from .models import Food, Category, Review
 from django.db.models.deletion import ProtectedError
 
 
@@ -39,7 +41,6 @@ class CreateCategoryView(View):
             form.save()
             messages.success(request, 'Category created successfully!')
             return redirect('foods:list-food')
-
 
         return render(request, 'category_form.html', {'form': form})
 
@@ -130,7 +131,6 @@ class DeleteCategoryView(View):
             return redirect('foods:list-food')
 
 
-
 class DeleteFoodView(View):
     @staff_or_superuser_required
     def get(self, request, pk):
@@ -170,15 +170,18 @@ class AllListView(CSVExportMixin,StaffSuperuserRequiredMixin,ListView ):
     def get_csv_export_filename(self):
         return 'foods_export'
 
+
 class UnListView(AllListView):
     def get_queryset(self):
         return Food.objects.filter(availability=False).select_related('category')
+
 
 class CategoryFoodsListView(AllListView):
     def get_queryset(self):
         category_id = self.kwargs['category_id']
         category = get_object_or_404(Category, id=category_id)
         return Food.objects.filter(category=category).select_related('category')
+
 
 class CategoryAllView(StaffSuperuserRequiredMixin,ListView):
     model = Category
@@ -188,3 +191,71 @@ class CategoryAllView(StaffSuperuserRequiredMixin,ListView):
     paginate_by = 10
     def get_queryset(self):
         return Category.objects.all().prefetch_related('parent')
+
+
+class SubmitReviewView(View):
+    template_name = 'Food_SubmitReview.html'
+
+    def get(self, request, id):
+        food = get_object_or_404(Food, pk=id)
+        form = ReviewForm()
+        return render(request, self.template_name, {'form': form, 'food': food})
+
+    def post(self, request, id):
+        food = get_object_or_404(Food, pk=id)
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.food = food
+            review.save()
+            return redirect('foods:list-food')
+
+        return render(request, self.template_name, {'form': form, 'food': food})
+
+
+
+class ManageReviewsView(View):
+    template_name = 'Food_ManageReview.html'
+    paginate_by = 10
+
+    @staff_or_superuser_required
+    def get(self, request):
+        pending_reviews = Review.objects.filter(is_approved=False)
+        paginator = Paginator(pending_reviews, self.paginate_by)
+        page = request.GET.get('page')
+
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        return render(request, self.template_name, {'pending_reviews': pending_reviews, 'page_obj': page_obj})
+
+
+
+class ApproveReviewView(View):
+    @staff_or_superuser_required
+    def post(self, request, id):
+        review = get_object_or_404(Review, pk=id)
+        action = request.POST.get('action')
+
+        if action == 'approve':
+            review.is_approved = True
+            review.save()
+        elif action == 'reject':
+            review.delete()
+
+        return redirect('foods:manage-reviews')
+
+class ListReviewsView(ListView):
+    model = Review
+    template_name = 'Food_ReviewListTemplate.html'
+    context_object_name = 'reviews'
+    ordering = ['-created_at']
+    paginate_by = 10
+    def get_queryset(self):
+        food_id = self.kwargs['id']
+        food = Food.objects.get(id=food_id)
+        return Review.objects.filter(food=food, is_approved=True)

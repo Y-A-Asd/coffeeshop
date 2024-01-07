@@ -15,4 +15,9 @@ urlpatterns = [
     path('list-all-food/<int:category_id>', views.CategoryFoodsListView.as_view(), name='list-category-food'),
     path('list-all-food-un/', views.UnListView.as_view(), name='list-all-food-un'),
     path('list-category/', views.CategoryAllView.as_view(), name='list-category'),
+    path('manage-reviews/', views.ManageReviewsView.as_view(), name='manage-reviews'),
+    path('submit-review/<int:id>', views.SubmitReviewView.as_view(), name='submit-review'),
+    path('approve-review/<int:id>', views.ApproveReviewView.as_view(), name='approve-review'),
+    path('food-review/<int:id>', views.ListReviewsView.as_view(), name='food-review'),
+
 ]

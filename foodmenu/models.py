@@ -1,5 +1,9 @@
+from django.core.validators import RegexValidator
+
 from core.models import BaseModel
 from django.db import models
+
+from users.models import User
 
 
 class Category(BaseModel):
@@ -29,3 +33,20 @@ class Food(BaseModel):
     def price_after_off(self):
         result = self.price - (self.price * self.off / 100)
         return round(result, 2)
+
+
+
+class Review(BaseModel):
+    phone_number = models.CharField(max_length=11, validators=[
+        RegexValidator(
+            regex=r'^09\d{9}$',
+            message='Phone number must start with "09" and have 11 digits.',
+            code='invalid_phone_number'
+        )])
+    is_approved = models.BooleanField(default=False)
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, related_name='foodrate')
+    rating = models.IntegerField()
+    comment = models.TextField()
+
+    def __str__(self):
+        return f"{self.phone_number} - {self.food.name}"
