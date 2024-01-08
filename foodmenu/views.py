@@ -221,7 +221,7 @@ class ManageReviewsView(View):
 
     @staff_or_superuser_required
     def get(self, request):
-        pending_reviews = Review.objects.filter(is_approved=False)
+        pending_reviews = Review.objects.filter(is_approved=False).select_related('food')
         paginator = Paginator(pending_reviews, self.paginate_by)
         page = request.GET.get('page')
 
@@ -258,4 +258,4 @@ class ListReviewsView(ListView):
     def get_queryset(self):
         food_id = self.kwargs['id']
         food = Food.objects.get(id=food_id)
-        return Review.objects.filter(food=food, is_approved=True)
+        return Review.objects.filter(food=food, is_approved=True).select_related('food')

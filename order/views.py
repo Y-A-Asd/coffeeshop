@@ -127,32 +127,32 @@ class BaseOrderListView(CSVExportMixin ,StaffSuperuserRequiredMixin, ListView):
 
 class OrderWaitingListView(BaseOrderListView):
     def get_queryset(self):
-        return Order.objects.filter(status='W')
+        return Order.objects.filter(status='W').select_related('table')
 
 
 class OrderFinishedListView(BaseOrderListView):
     def get_queryset(self):
-        return Order.objects.filter(status='F')
+        return Order.objects.filter(status='F').select_related('table')
 
 
 class OrderPreparationListView(BaseOrderListView):
     def get_queryset(self):
-        return Order.objects.filter(status='P')
+        return Order.objects.filter(status='P').select_related('table')
 
 
 class OrderTransmissionListView(BaseOrderListView):
     def get_queryset(self):
-        return Order.objects.filter(status='T')
+        return Order.objects.filter(status='T').select_related('table')
 
 
 class OrderCanceldListView(BaseOrderListView):
     def get_queryset(self):
-        return Order.objects.filter(status='C')
+        return Order.objects.filter(status='C').select_related('table')
 
 
 class OrderAllListView(BaseOrderListView):
     def get_queryset(self):
-        return Order.objects.all()
+        return Order.objects.all().select_related('table')
 
 
 class OrderSearchListView(BaseOrderListView):

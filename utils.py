@@ -9,7 +9,7 @@ from django.db.models.functions import ExtractHour, Extract, ExtractWeekDay
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.apps import AppConfig
-from django.db.models import Q, Sum, F, ExpressionWrapper, DecimalField
+from django.db.models import Q, Sum, F, ExpressionWrapper, DecimalField, Avg
 from django.http import HttpResponse
 
 from core.models import AuditLog
@@ -57,14 +57,17 @@ If you use iterator() to run the query,
 
 You can use the Prefetch object to further control the prefetch operation.
     """
-    categories = (Category.objects.select_related('parent')
-                  .prefetch_related(
-        Prefetch('subcategories', queryset=Category.objects.select_related('parent')
-                 # .exclude(parent_id__in=Category.objects.values_list('id'))
-                 .prefetch_related(Prefetch('food_set', queryset=Food.objects.filter(availability=True)))),
-        Prefetch('food_set', queryset=Food.objects.filter(availability=True))
-    ).filter(Q(parent__isnull=True) | Q(id__in=(Category.objects.values_list('parent_id', flat=True)))))
-
+    categories = (
+        Category.objects.filter(Q(parent__isnull=True) | Q(id__in=Category.objects.values_list('parent_id', flat=True)))
+        .select_related('parent')
+        .prefetch_related(
+            Prefetch('subcategories', queryset=Category.objects.filter(deleted_at__isnull=True).select_related(
+                'parent').prefetch_related(
+                Prefetch('food_set', queryset=Food.objects.filter(availability=True))
+            )),
+            Prefetch('food_set', queryset=Food.objects.filter(availability=True))
+        )
+    )
     """
     this code will generate:) Absolute Magic ->
     """
@@ -101,27 +104,28 @@ You can use the Prefetch object to further control the prefetch operation.
             'subcategories': []
         }
 
+        # Fetch reviews for all foods in the category
+        food_reviews = Review.objects.filter(food__category=category, is_approved=True).values('food').annotate(
+            average_rating=Avg('rating'),
+            reviews_count=Count('id')
+        )
+
+        food_reviews_mapping = {review['food']: review for review in food_reviews}
+
         for food in category.food_set.all():
-            reviews: Review=Review.objects.filter(food=food, is_approved=True)
-            average_rating = sum(rate.rating  for rate in reviews)
-            reviews_count = len(reviews) or 0
-            try:
-                average_rating = average_rating / reviews_count
-            except ZeroDivisionError:
-                average_rating = 0
+            review_data = food_reviews_mapping.get(food.id, {'average_rating': 0, 'reviews_count': 0})
+
             category_data['foods'].append({
-                'foodimage':food.foodimage,
                 'id': food.id,
                 'name': food.name,
                 'original_price': food.price,
                 'off_percent': food.off,
                 'price_after_off': food.price_after_off,
-                'average_rating':average_rating,
-                'reviews_count':reviews_count
+                'average_rating': review_data['average_rating'],
+                'reviews_count': review_data['reviews_count']
             })
 
         for subcategory in category.subcategories.all():
-            if is_parent(subcategory): continue
             subcategory_data = {
                 'id': subcategory.id,
                 'name': subcategory.name,
@@ -129,26 +133,32 @@ You can use the Prefetch object to further control the prefetch operation.
                 'foods': []
             }
 
+            # Fetch reviews for all foods in the subcategory
+            subcategory_food_reviews = Review.objects.filter(food__category=subcategory, is_approved=True).values(
+                'food').annotate(
+                average_rating=Avg('rating'),
+                reviews_count=Count('id')
+            )
+
+            subcategory_food_reviews_mapping = {review['food']: review for review in subcategory_food_reviews}
+
             for food in subcategory.food_set.all():
-                reviews: Review = Review.objects.filter(food=food, is_approved=True)
-                average_rating = sum(rate.rating for rate in reviews)
-                reviews_count = len(reviews) or 0
-                try:
-                    average_rating = average_rating / reviews_count
-                except ZeroDivisionError:
-                    average_rating = 0
+                review_data = subcategory_food_reviews_mapping.get(food.id, {'average_rating': 0, 'reviews_count': 0})
+
                 subcategory_data['foods'].append({
-                    'foodimage': food.foodimage,
                     'id': food.id,
                     'name': food.name,
                     'original_price': food.price,
                     'off_percent': food.off,
                     'price_after_off': food.price_after_off,
-                    'average_rating': average_rating,
-                    'reviews_count': reviews_count
+                    'average_rating': review_data['average_rating'],
+                    'reviews_count': review_data['reviews_count']
                 })
+
             category_data['subcategories'].append(subcategory_data)
+
         menu.append(category_data)
+
     return menu
 
 

@@ -195,16 +195,30 @@ class ListTableView(StaffSuperuserRequiredMixin, ListView):
     template_name = 'Reservation_ListTableTemplate.html'
     context_object_name = 'table'
 
+    def get_queryset(self):
+        return Table.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['table_orders'] = {}
-        for table_instance in context['table']:
-            try:
-                order = Order.objects.filter(table=table_instance, status__in=["W", "P", "T"])
-                context['table_orders'][table_instance.id] = order
-            except Order.DoesNotExist:
-                pass
+
+        # context['table_orders'] = {}
+        # for table_instance in context['table']:
+        #     try:
+        #         order = Order.objects.filter(table=table_instance, status__in=["W", "P", "T"])
+        #         context['table_orders'][table_instance.id] = order
+        #     except Order.DoesNotExist:
+        #         pass
+
+        table_ids = [table.id for table in context['table']]
+
+        orders_dict = Order.objects.filter(
+            deleted_at__isnull=True,
+            status__in=["W", "P", "T"],
+            table_id__in=table_ids
+        ).order_by('-created_at').in_bulk(field_name='id')
+
+        context['table_orders'] = {table.id: orders_dict.get(table.id, []) for table in context['table']}
+
         return context
 
 

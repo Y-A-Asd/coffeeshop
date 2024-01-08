@@ -6,10 +6,6 @@
 {% block stylesheets %}{% endblock stylesheets %}
 {% load static %}
 {% block content %}
-
-
-
-
     <div class="py-4 mx-5 mx-lg-12">
         <div class="dropdown">
             <button class="w-100 btn btn-gray-800 d-inline-flex align-items-center me-2 dropdown-toggle py-4"
@@ -82,7 +78,7 @@
     
     
     
-    <div class="mx-12 row my-4 justify-content-between">
+    <div class="mx-5 mx-lg-12 row my-4 justify-content-between">
     <form method="get" action="" class="row justify-content-between">
         <div class="col-5">
             <label for="start_date">Start at:</label>
@@ -583,7 +579,7 @@
                                 <a class="nav-link" href="{% url 'tags:tag' %}">
                                     <span class="sidebar-text">Tags List</span>
                                 </a>
-                            </li> 
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'foods:list-food' %}">
                                     <span class="sidebar-text">Menu</span>
