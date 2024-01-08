@@ -105,10 +105,10 @@ You can use the Prefetch object to further control the prefetch operation.
         }
 
         # Fetch reviews for all foods in the category
-        food_reviews = Review.objects.filter(food__category=category, is_approved=True).values('food').annotate(
+        food_reviews = Review.objects.filter(is_approved=True).values('food').annotate(
             average_rating=Avg('rating'),
             reviews_count=Count('id')
-        )
+        ).prefetch_related('food__category')
 
         food_reviews_mapping = {review['food']: review for review in food_reviews}
 
@@ -134,13 +134,13 @@ You can use the Prefetch object to further control the prefetch operation.
             }
 
             # Fetch reviews for all foods in the subcategory
-            subcategory_food_reviews = Review.objects.filter(food__category=subcategory, is_approved=True).values(
-                'food').annotate(
-                average_rating=Avg('rating'),
-                reviews_count=Count('id')
-            )
+            # subcategory_food_reviews = Review.objects.filter(is_approved=True).values(
+            #     'food').annotate(
+            #     average_rating=Avg('rating'),
+            #     reviews_count=Count('id')
+            # ).prefetch_related('food__category')
 
-            subcategory_food_reviews_mapping = {review['food']: review for review in subcategory_food_reviews}
+            subcategory_food_reviews_mapping = {review['food']: review for review in food_reviews}
 
             for food in subcategory.food_set.all():
                 review_data = subcategory_food_reviews_mapping.get(food.id, {'average_rating': 0, 'reviews_count': 0})

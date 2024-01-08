@@ -216,7 +216,19 @@ class ListTableView(StaffSuperuserRequiredMixin, ListView):
             status__in=["W", "P", "T"],
             table_id__in=table_ids
         ).order_by('-created_at').in_bulk(field_name='id')
-
+        """
+        
+        in_bulk():
+        
+        Takes a list of field values (id_list) and the field_name for those values,
+         and returns a dictionary mapping each value to an instance of the object with the given field value.
+          No django.core.exceptions.ObjectDoesNotExist exceptions will ever be raised by in_bulk;
+           that is, any id_list value not matching any instance will simply be ignored.
+            If id_list isn’t provided, all objects in the queryset are returned.
+             field_name must be a unique field or a distinct field (if there’s only one field specified in distinct()).
+              field_name defaults to the primary key.
+              
+        """
         context['table_orders'] = {table.id: orders_dict.get(table.id, []) for table in context['table']}
 
         return context
