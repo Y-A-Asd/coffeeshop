@@ -4,13 +4,15 @@ from django.db import models
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+
 class Offkey(models.Model):
     code = models.CharField(max_length=50, unique=True)
     valid_from = models.DateField()
     valid_to = models.DateField()
-    discount = models.DecimalField(validators=[
-                                   MinValueValidator(0),
-                                   MaxValueValidator(100)
+    discount = models.DecimalField(max_digits=3, decimal_places=0,
+                                   validators=[
+                                       MinValueValidator(0),
+                                       MaxValueValidator(100)
                                    ])
     active = models.BooleanField()
 
