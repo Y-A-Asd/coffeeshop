@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'tables',
     'users',
     'widget_tweaks',
+    'offkey',
     # 'django_nose',
 ]
 
