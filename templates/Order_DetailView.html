@@ -36,7 +36,7 @@
                     <h1 class="mb-0 h3">
                         {{ order.id }}<br>
                     </h1>
-                    <br/>
+                    <br>
                     <p>
                         {% if messages %}
                             <p class="text-danger">
@@ -83,23 +83,23 @@
                         </tbody>
                     </table>
                 </div>
-            <br><br>
-            <p><b>Total:</b> {{ order.get_total_cost|floatformat }}<br></p>
-            {% if order.discount %}
-                            <tr class="subtotal">
-                                <td class="num">${{ order.get_total_cost_before_discount|floatformat }}</td>
-                            </tr>
-                            <tr>
-                                <td>-->
-                                    "{{ order.offkey.code }}" code
-                                    ({{ order.offkey.discount }}% off)
-                                </td>
-                                <td colspan="4"></td>
-                                <td class="num neg">
-                                    --> ${{ order.get_total_cost|floatformat:2 }}
-                                </td>
-                            </tr>
-                        {% endif %}
+                <br><br>
+                <p><b>Total:</b> {{ order.get_total_cost|floatformat }}<br></p>
+                {% if order.discount %}
+                    <tr class="subtotal">
+                        <td class="num"> ${{ order.get_total_cost_before_discount|floatformat }} </td>
+                    </tr>
+                    <tr>
+                        <td>-->
+                            "{{ order.offkey.code }}" code
+                            ({{ order.offkey.discount }}% off)
+                        </td>
+                        <td colspan="4"></td>
+                        <td class="num neg">
+                            --> ${{ order.get_total_cost|floatformat:2 }}
+                        </td>
+                    </tr>
+                {% endif %}
             </div>
         </div>
 

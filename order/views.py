@@ -94,10 +94,15 @@ class MakeOrderView(View):
             order.save()
             for item in cart:
                 # print(order,item['product'],item['price'],item['quantity'])
-                OrderItem.objects.create(order=order,
-                                         product=item['product'],
-                                         price=item['price'],
-                                         quantity=item['quantity'])
+                if item['product'].availability:
+                    OrderItem.objects.create(order=order,
+                                             product=item['product'],
+                                             price=item['price'],
+                                             quantity=item['quantity'])
+                else:
+                    cart.clear()
+                    messages.error(request, 'Am I Joke To You!')
+                    return redirect('order:detail-cart')
             cart.clear()
             messages.success(request, 'Order created successfully!')
             return render(request, self.template_name, {'order': order})
