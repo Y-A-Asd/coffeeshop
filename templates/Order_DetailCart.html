@@ -84,6 +84,12 @@
                                 {% endfor %}</p>
                         {% endif %}
                     </p>
+                    <p>Apply a coupon:</p>
+                    <form action="{% url "offkey:off" %}" method="post">
+                        {{ getoff }}
+                        <input class="btn btn-dropbox" type="submit" value="Apply">
+                        {% csrf_token %}
+                    </form>
                 </div>
 
                 <div class="card card-body border-0 shadow table-wrapper table-responsive">
@@ -121,10 +127,34 @@
                                 </tr>
                             {% endwith %}
                         {% endfor %}
+                        {#                        <tr class="bg-gray-800 fw-bolder text-white">#}
+                        {#                            <td>Total</td>#}
+                        {#                            <td colspan="4"></td>#}
+                        {#                            <td class="">${{ cart.get_total_price }}</td>#}
+                        {#                        </tr>#}
+                        {% if cart.coupon %}
+                            <tr class="subtotal">
+                                <td>Subtotal</td>
+                                <td colspan="4"></td>
+                                <td class="num">${{ cart.get_total_price|floatformat:2 }}</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    "{{ cart.coupon.code }}" coupon
+                                    ({{ cart.coupon.discount }}% off)
+                                </td>
+                                <td colspan="4"></td>
+                                <td class="num neg">
+                                    - ${{ cart.get_discount|floatformat:2 }}
+                                </td>
+                            </tr>
+                        {% endif %}
                         <tr class="bg-gray-800 fw-bolder text-white">
                             <td>Total</td>
                             <td colspan="4"></td>
-                            <td class="">${{ cart.get_total_price }}</td>
+                            <td class="num">
+                                ${{ cart.get_total_price_after_discount|floatformat:2 }}
+                            </td>
                         </tr>
                         </tbody>
                     </table>

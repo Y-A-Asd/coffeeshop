@@ -1,5 +1,5 @@
 import csv
-
+from offkey.forms import GetOff
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -53,7 +53,8 @@ class DetailCartView(View):
             item['update_quantity_form'] = CartAddProductForm(initial={
                 'quantity': item['quantity'],
                 'override': True})
-        return render(request, self.template_name, {'cart': cart})
+        getoff = GetOff()
+        return render(request, self.template_name, {'cart': cart, 'getoff': getoff})
 
 
 class MakeOrderView(View):

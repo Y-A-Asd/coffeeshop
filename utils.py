@@ -1,5 +1,6 @@
 import csv
-from abc import ABC,abstractmethod
+from offkey.models import Offkey
+from abc import ABC, abstractmethod
 from collections import namedtuple
 from datetime import timedelta
 from functools import wraps
@@ -11,7 +12,9 @@ from django.dispatch import receiver
 from django.apps import AppConfig
 from django.db.models import Q, Sum, F, ExpressionWrapper, DecimalField, Avg
 from django.http import HttpResponse
-
+from decimal import Decimal
+from django.conf import settings
+from foodmenu.models import Food, Category
 from core.models import AuditLog
 from tables.models import Table
 from tag.models import TaggedItem, Tag
@@ -293,18 +296,16 @@ def update_food_availability(changed_tag):
     print('FOOD_MAP:', food_availability_map)
     for food_id in food_ids:
         food = Food.objects.get(id=food_id)
-        print('FoodAFter',food)
+        print('FoodAFter', food)
         if food_availability_map.get(food_id) and food_availability_map.get(food_id) > 0:
             food.availability = False
         else:
             food.availability = True
-        print('FINAL',food.availability)
+        print('FINAL', food.availability)
         food.save()
 
 
-from decimal import Decimal
-from django.conf import settings
-from foodmenu.models import Food, Category
+
 
 
 class Cart:
@@ -317,6 +318,8 @@ class Cart:
         if not cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
+
+        self.offkey = request.COOKIES.get('offkey', None)
 
     def add(self, product, quantity=1, override_quantity=False):
         """
@@ -388,6 +391,24 @@ class Cart:
         order.status = "C"
         order.save()
 
+    @property
+    def coupon(self):
+        if self.offkey:
+            try:
+                return Offkey.objects.get(id=self.offkey)
+            except Offkey.DoesNotExist:
+                pass
+        return None
+
+    def get_discount(self):
+        if self.offkey:
+            return (self.offkey.discount / Decimal(100)) \
+                * self.get_total_price()
+        return Decimal(0)
+
+    def get_total_price_after_discount(self):
+        return self.get_total_price() - self.get_discount()
+
 
 class Reporting:
     """
@@ -406,7 +427,6 @@ class Reporting:
             self.start_at = kwargs['start_at']
             self.end_at = kwargs['end_at']
             self.time_filter = Q(created_at__range=[self.start_at, self.end_at])
-
 
     def total_sales(self):
         """
@@ -440,7 +460,7 @@ class Reporting:
     def favorite_tables(self):
         try:
             time_filter = Q(orders__created_at__gte=timezone.now()
-                                              - timezone.timedelta(days=self.days))
+                                                    - timezone.timedelta(days=self.days))
         except AttributeError:
             time_filter = Q(orders__created_at__range=[self.start_at, self.end_at])
 
@@ -469,7 +489,7 @@ class Reporting:
 
         try:
             time_filter = Q(orderitem__order__created_at__gte=timezone.now()
-                                              - timezone.timedelta(days=self.days))
+                                                              - timezone.timedelta(days=self.days))
         except AttributeError:
             time_filter = Q(orderitem__order__created_at__range=[self.start_at, self.end_at])
 
@@ -602,7 +622,7 @@ class Reporting:
 
         try:
             time_filter = Q(food__orderitem__order__created_at__gte=timezone.now()
-                                              - timezone.timedelta(days=self.days))
+                                                                    - timezone.timedelta(days=self.days))
         except AttributeError:
             time_filter = Q(food__orderitem__order__created_at__range=[self.start_at, self.end_at])
 
@@ -707,7 +727,6 @@ class Reporting:
 
         print(result_data)
         return result_data
-
 
 
 class CSVExportMixin():
