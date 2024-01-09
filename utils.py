@@ -119,6 +119,7 @@ You can use the Prefetch object to further control the prefetch operation.
             review_data = food_reviews_mapping.get(food.id, {'average_rating': 0, 'reviews_count': 0})
 
             category_data['foods'].append({
+                'foodimage':food.foodimage,
                 'id': food.id,
                 'name': food.name,
                 'original_price': food.price,
@@ -129,6 +130,7 @@ You can use the Prefetch object to further control the prefetch operation.
             })
 
         for subcategory in category.subcategories.all():
+            if is_parent(subcategory): continue
             subcategory_data = {
                 'id': subcategory.id,
                 'name': subcategory.name,
@@ -149,6 +151,7 @@ You can use the Prefetch object to further control the prefetch operation.
                 review_data = subcategory_food_reviews_mapping.get(food.id, {'average_rating': 0, 'reviews_count': 0})
 
                 subcategory_data['foods'].append({
+                    'foodimage': food.foodimage,
                     'id': food.id,
                     'name': food.name,
                     'original_price': food.price,
@@ -232,7 +235,7 @@ class Authentication:
                       auth_password=settings.EMAIL_HOST_PASSWORD)
             return otp, otp_expiry
         except Exception as e:
-            print(f"Error sending email: {e}")
+            # print(f"Error sending email: {e}")
             return None
 
     @staticmethod
@@ -247,14 +250,14 @@ class Authentication:
         dist_phone_number = phone_number.replace("0", "+98", 1)
 
         client = Client(account_sid, auth_token)
-        print("Phone Number:", dist_phone_number)
+        # print("Phone Number:", dist_phone_number)
         message = client.messages.create(
             body=f'Your code is: {otp}',
             from_=twilio_phone_number,
             to=dist_phone_number
         )
 
-        print("Twilio Response:", message)
+        # print("Twilio Response:", message)
         return otp, otp_expiry
 
     @staticmethod
@@ -282,7 +285,7 @@ def update_food_availability(changed_tag):
     food_ids = TaggedItem.objects.filter(
         tag=changed_tag).values_list(
         'object_id', flat=True).distinct()
-    print('FOOD_IDS:', food_ids)
+    # print('FOOD_IDS:', food_ids)
     food_availability_annotation = (
         TaggedItem.objects
         .filter(object_id__in=food_ids)
@@ -290,18 +293,18 @@ def update_food_availability(changed_tag):
         .annotate(unavailable_tags_count=Count(
             'id', filter=models.Q(tag__available=False)))
     )
-    print('FOOD_ANNotate:', food_availability_annotation)
+    # print('FOOD_ANNotate:', food_availability_annotation)
     food_availability_map = {item['object_id']: item['unavailable_tags_count'] for item in
                              food_availability_annotation}
-    print('FOOD_MAP:', food_availability_map)
+    # print('FOOD_MAP:', food_availability_map)
     for food_id in food_ids:
         food = Food.objects.get(id=food_id)
-        print('FoodAFter', food)
+        # print('FoodAFter', food)
         if food_availability_map.get(food_id) and food_availability_map.get(food_id) > 0:
             food.availability = False
         else:
             food.availability = True
-        print('FINAL', food.availability)
+        # print('FINAL', food.availability)
         food.save()
 
 
@@ -419,7 +422,7 @@ class Reporting:
     """
 
     def __init__(self, kwargs):
-        print(kwargs)
+        # print(kwargs)
         if 'days' in kwargs:
             self.days = kwargs['days']
             self.time_filter = Q(created_at__gte=timezone.now() - timezone.timedelta(days=self.days))
@@ -454,7 +457,10 @@ class Reporting:
                 F('items__price') * F('items__quantity'),
             )
         )
-
+        # if total_sales['total_sales'] :
+        #     pass
+        # else:
+        #     total_sales['total_sales'] =0
         return total_sales['total_sales']
 
     def favorite_tables(self):
@@ -531,12 +537,16 @@ class Reporting:
         except AttributeError:
             return 0
         previous_days_sales = Reporting(reporting_params).total_sales()
+        print(current_sales, previous_days_sales)
         if previous_days_sales:
-            percentage_difference = ((current_sales - previous_days_sales) / previous_days_sales) * 100
+            if current_sales :
+                percentage_difference = ((current_sales - previous_days_sales) / previous_days_sales) * 100
+            else:
+                percentage_difference = ((0 - previous_days_sales) / previous_days_sales) * 100
         else:
-            percentage_difference = 0
+            percentage_difference = current_sales * 100
 
-        return -percentage_difference
+        return percentage_difference
 
     def peak_hours(self):  # todo: Dahanam sevice shod :-|
         start_hour = 0
@@ -702,7 +712,7 @@ class Reporting:
             )
             for user_phone_number, data in employee_sales_data.items()
         ]
-        print(result_data)
+        # print(result_data)
         return result_data
 
     def order_status_counts(self):

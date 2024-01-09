@@ -55,7 +55,7 @@ class DashboardView(View):
         peak_hour, most_peak_hour = r.peak_hours()
         context = {
             'total_sales': total_sales,
-            'percentage_difference': -percentage_difference,
+            'percentage_difference': percentage_difference,
             'favorite_food': r.favorite_foods(),
             'favorite_table': r.favorite_tables(),
             'peak_hour': peak_hour,
