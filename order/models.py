@@ -1,9 +1,13 @@
 import uuid
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Sum, F
 
 from core.models import BaseModel
 from foodmenu.models import Food
+from offkey.models import Offkey
 from tables.models import Table
 
 
@@ -20,6 +24,14 @@ class Order(BaseModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     status = models.CharField(max_length=1, choices=status_fields, default='W')
     table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True, related_name='orders')
+    coupon = models.ForeignKey(Offkey,
+                               related_name='orders',
+                               null=True,
+                               blank=True,
+                               on_delete=models.SET_NULL)
+    discount = models.IntegerField(default=0,
+                                   validators=[MinValueValidator(0),
+                                               MaxValueValidator(100)])
 
     class Meta:
         ordering = ['-created_at']
@@ -27,8 +39,18 @@ class Order(BaseModel):
             models.Index(fields=['-created_at']),
         ]
 
-    def get_total_cost(self):
+    def get_total_cost_before_discount(self):
         return sum(item.get_cost() for item in self.items.all())
+
+    def get_discount(self):
+        total_cost = self.get_total_cost_before_discount()
+        if self.discount:
+            return total_cost * (self.discount / Decimal(100))
+        return Decimal(0)
+
+    def get_total_cost(self):
+        total_cost = self.get_total_cost_before_discount()
+        return total_cost - self.get_discount()
 
     def __str__(self):
         return f"Order #{self.id} - {self.customer_phone} - {self.table}"
