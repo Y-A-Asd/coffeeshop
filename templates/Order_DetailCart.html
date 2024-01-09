@@ -84,10 +84,10 @@
                                 {% endfor %}</p>
                         {% endif %}
                     </p>
-                    <p>Apply a coupon:</p>
-                    <form action="{% url "offkey:off" %}" method="post">
+                    <p>Apply Off:</p>
+                    <form class="mx-12" action="{% url "offkey:off" %}" method="post">
                         {{ getoff }}
-                        <input class="btn btn-dropbox" type="submit" value="Apply">
+                        <input class="btn btn-dropbox my-3" type="submit" value="Apply">
                         {% csrf_token %}
                     </form>
                 </div>
@@ -132,7 +132,7 @@
                         {#                            <td colspan="4"></td>#}
                         {#                            <td class="">${{ cart.get_total_price }}</td>#}
                         {#                        </tr>#}
-                        {% if cart.coupon %}
+                        {% if cart.offkey %}
                             <tr class="subtotal">
                                 <td>Subtotal</td>
                                 <td colspan="4"></td>
@@ -140,8 +140,8 @@
                             </tr>
                             <tr>
                                 <td>
-                                    "{{ cart.coupon.code }}" coupon
-                                    ({{ cart.coupon.discount }}% off)
+                                    "{{ cart.offkey.code }}" code
+                                    ({{ cart.offkey.discount }}% off)
                                 </td>
                                 <td colspan="4"></td>
                                 <td class="num neg">

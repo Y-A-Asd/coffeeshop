@@ -319,7 +319,7 @@ class Cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
         self.cart = cart
 
-        self.offkey = request.COOKIES.get('offkey', None)
+        self.offkey_id = request.COOKIES.get('offkey', None)
 
     def add(self, product, quantity=1, override_quantity=False):
         """
@@ -392,10 +392,10 @@ class Cart:
         order.save()
 
     @property
-    def coupon(self):
-        if self.offkey:
+    def offkey(self):
+        if self.offkey_id and self.offkey_id != 'None':
             try:
-                return Offkey.objects.get(id=self.offkey)
+                return Offkey.objects.get(id=self.offkey_id)
             except Offkey.DoesNotExist:
                 pass
         return None

@@ -68,10 +68,16 @@
                     {% for item in cart %}
                         <li>
                             {{ item.quantity }}x {{ item.product.name }}
-                            <span class="fw-bolder mx-2"> ${{ item.total_price }}</span>
+                            <span>${{ item.total_price|floatformat:2 }}</span>
                         </li>
                     {% endfor %}
-                    <p class="btn w-100 btn-secondary text-dark my-4">Total: ${{ cart.get_total_price }}</p>
+                    {% if cart.offkey %}
+                        <li>
+                            "{{ cart.offkey.code }}" ({{ cart.offkey.discount }}% off)
+                            <span class="neg">- ${{ cart.get_discount|floatformat:2 }}</span>
+                        </li>
+                    {% endif %}
+                    <p class="btn w-100 btn-secondary text-dark my-4">Total:  ${{ cart.get_total_price_after_discount|floatformat:2 }}</p>
                     <form method="post" class="">
                         {{ form.as_p }}
                         <p><input class="btn fw-extrabold w-100 btn-primary text-white text-dark my-4" type="submit"
