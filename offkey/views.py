@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.utils import timezone
 from .forms import GetOff
 from django.shortcuts import render, redirect
@@ -5,6 +6,7 @@ from django.views import View
 from .models import Offkey
 
 # Create your views here.
+
 
 class OffKeyView(View):
     """
@@ -22,13 +24,16 @@ class OffKeyView(View):
                                             active=True
                                             )
                 if offkey.mode == 'OT':
-                    offkey.active = False
-                    offkey.save()
+                    # offkey.active = False
+                    # offkey.save()
+                    pass
                 else:
                     if not offkey.valid_to >= now:
                         raise Offkey.DoesNotExist()
+                messages.success(request, 'Code applied successfully')
                 response.set_cookie('offkey', offkey.id)
             except Offkey.DoesNotExist:
+                messages.error(request, "Code doesn't found")
                 response.set_cookie('offkey', None)
 
         return response

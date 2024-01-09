@@ -87,6 +87,9 @@ class MakeOrderView(View):
             order = form.save(commit=False)
             if cart.offkey:
                 order.offkey = cart.offkey
+                if order.offkey.mode == 'OT':
+                    order.offkey.active = False
+                    order.offkey.save()
                 order.discount = cart.offkey.discount
             order.save()
             for item in cart:
