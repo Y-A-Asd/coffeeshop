@@ -18,7 +18,7 @@ class Offkey(BaseModel):
     code = models.CharField(max_length=50, unique=True)
     valid_from = models.DateField()
     valid_to = models.DateField(null=True, blank=True)
-    discount = models.DecimalField(max_digits=3, decimal_places=0,
+    discount = models.DecimalField(max_digits=3, decimal_places=1,
                                    validators=[
                                        MinValueValidator(0),
                                        MaxValueValidator(100)

@@ -119,7 +119,7 @@ You can use the Prefetch object to further control the prefetch operation.
             review_data = food_reviews_mapping.get(food.id, {'average_rating': 0, 'reviews_count': 0})
 
             category_data['foods'].append({
-                'foodimage':food.foodimage,
+                'foodimage': food.foodimage,
                 'id': food.id,
                 'name': food.name,
                 'original_price': food.price,
@@ -308,9 +308,6 @@ def update_food_availability(changed_tag):
         food.save()
 
 
-
-
-
 class Cart:
     def __init__(self, request):
         """
@@ -424,9 +421,11 @@ class Reporting:
     def __init__(self, kwargs):
         # print(kwargs)
         if 'days' in kwargs:
+            print('here')
             self.days = kwargs['days']
             self.time_filter = Q(created_at__gte=timezone.now() - timezone.timedelta(days=self.days))
         elif 'start_at' in kwargs and 'end_at' in kwargs:
+            print('here too')
             self.start_at = kwargs['start_at']
             self.end_at = kwargs['end_at']
             self.time_filter = Q(created_at__range=[self.start_at, self.end_at])
@@ -454,9 +453,11 @@ class Reporting:
 
         total_sales = orders.aggregate(
             total_sales=Sum(
-                F('items__price') * F('items__quantity'),
+                F('items__price') * F('items__quantity') -
+                (F('items__price') * F('items__quantity') * F('discount') / Decimal(100.0))
             )
-        )
+        )or 0.00
+        """https://www.reddit.com/r/djangolearning/comments/jtvbxn/rounding_an_aggregation_to_2_decimal_places/"""
         # if total_sales['total_sales'] :
         #     pass
         # else:
@@ -465,8 +466,7 @@ class Reporting:
 
     def favorite_tables(self):
         try:
-            time_filter = Q(orders__created_at__gte=timezone.now()
-                                                    - timezone.timedelta(days=self.days))
+            time_filter = Q(orders__created_at__gte=timezone.now() - timezone.timedelta(days=self.days))
         except AttributeError:
             time_filter = Q(orders__created_at__range=[self.start_at, self.end_at])
 
@@ -508,7 +508,9 @@ class Reporting:
             .annotate(
                 used_foods=Sum('orderitem__quantity', distinct=True),
                 total_sales=Sum(
-                    F('orderitem__quantity') * F('orderitem__price'),
+                    ((F('orderitem__price') * F('orderitem__quantity')) - (
+                                F('orderitem__price') * F('orderitem__quantity') * (
+                            F('orderitem__order__discount')) / 100))
                 )
             )
             .select_related('category')
@@ -537,9 +539,9 @@ class Reporting:
         except AttributeError:
             return 0
         previous_days_sales = Reporting(reporting_params).total_sales()
-        print(current_sales, previous_days_sales)
+        # print(current_sales, previous_days_sales)
         if previous_days_sales:
-            if current_sales :
+            if current_sales:
                 percentage_difference = ((current_sales - previous_days_sales) / previous_days_sales) * 100
             else:
                 percentage_difference = ((0 - previous_days_sales) / previous_days_sales) * 100
@@ -735,7 +737,7 @@ class Reporting:
             for status_data in status_counts
         ]
 
-        print(result_data)
+        # print(result_data)
         return result_data
 
 
