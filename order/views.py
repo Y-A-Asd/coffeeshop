@@ -60,7 +60,6 @@ class DetailCartView(View):
 class MakeOrderView(View):
     template_name = 'Order_CreateOrder.html'
 
-
     def get(self, request):
         cart = Cart(request)
         form = OrderCreateForm()
@@ -69,7 +68,6 @@ class MakeOrderView(View):
         else:
             messages.error(request, 'You cannot Checkout with empty cart')
             return redirect('order:detail-cart')
-
 
     def post(self, request):
         cart = Cart(request)
@@ -86,7 +84,11 @@ class MakeOrderView(View):
                 table.status = 'F'
                 table.save()
 
-            order = form.save()
+            order = form.save(commit=False)
+            if cart.offkey:
+                order.offkey = cart.offkey
+                order.discount = cart.offkey.discount
+            order.save()
             for item in cart:
                 # print(order,item['product'],item['price'],item['quantity'])
                 OrderItem.objects.create(order=order,
@@ -109,7 +111,7 @@ class ChangeOrderView(View):
         return redirect('order:detail-cart')
 
 
-class BaseOrderListView(CSVExportMixin ,StaffSuperuserRequiredMixin, ListView):
+class BaseOrderListView(CSVExportMixin, StaffSuperuserRequiredMixin, ListView):
     model = Order
     template_name = 'Order_ListOrder.html'
     context_object_name = 'orders'
@@ -162,7 +164,6 @@ class OrderSearchListView(BaseOrderListView):
         return Order.objects.filter(customer_phone__icontains=customer_phone)
 
 
-
 class ChangeStatusOrderView(StaffSuperuserRequiredMixin, View):
     def post(self, request, pk):
         new_status: str = request.POST.get('new_status')
@@ -183,9 +184,11 @@ class ListOrderPhoneView(CSVExportMixin, View):
 
     def get_csv_export_queryset(self):
         if self.request.user.is_superuser or self.request.user.is_staff:
-            orders = Order.objects.filter(customer_phone=self.kwargs['phone']).select_related('table').order_by('-created_at')
+            orders = Order.objects.filter(customer_phone=self.kwargs['phone']).select_related('table').order_by(
+                '-created_at')
         else:
-            orders = Order.objects.filter(customer_phone=self.request.user.phone_number).select_related('table').order_by('-created_at')
+            orders = Order.objects.filter(customer_phone=self.request.user.phone_number).select_related(
+                'table').order_by('-created_at')
         return orders
 
     def get_csv_export_filename(self):
@@ -199,7 +202,8 @@ class ListOrderPhoneView(CSVExportMixin, View):
         else:
             if not str(request.user.phone_number) == phone:
                 messages.error(request, "You don't have permission to access others order.")
-            orders = Order.objects.filter(customer_phone=request.user.phone_number).select_related('table').order_by('-created_at')
+            orders = Order.objects.filter(customer_phone=request.user.phone_number).select_related('table').order_by(
+                '-created_at')
 
         paginator = Paginator(orders, self.paginate_by)
         page = request.GET.get('page')
@@ -223,8 +227,6 @@ class OrderDetailView(LoginRequiredMixin, SingleObjectMixin, View):
             messages.error(request, "You don't have permission to access this order.")
             return redirect('order:phone-orders', request.user.phone_number)
         return render(request, self.template_name, {'order': order})
-
-
 
 
 class GetPhoneOrderView(StaffSuperuserRequiredMixin, View):
@@ -273,9 +275,9 @@ class CustomerOrdersView(CSVExportMixin, StaffSuperuserRequiredMixin, View):
             orders
             .values('customer_phone')
             .annotate(count=Count('id'),
-                      total = Sum(
-                    F('items__price') * F('items__quantity'),
-            )
+                      total=Sum(
+                          F('items__price') * F('items__quantity'),
+                      )
                       )
             .order_by('-total')
         )
