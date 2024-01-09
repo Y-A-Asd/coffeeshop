@@ -29,7 +29,7 @@ urlpatterns = [
     path('blogs/', include('blog.urls', namespace='blog')),
     path('users/', include('users.urls', namespace='users')),
     path('tables/', include('tables.urls', namespace='tables')),
-
+    path('keys/', include('offkey.urls', namespace='offkey')),
     path('orders/', include('order.urls', namespace='order')),
     path('tags/', include('tag.urls', namespace='tags')),
 
