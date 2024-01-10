@@ -259,3 +259,9 @@ class ListReviewsView(ListView):
         food_id = self.kwargs['id']
         food = Food.objects.get(id=food_id)
         return Review.objects.filter(food=food, is_approved=True).select_related('food')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        food_id = self.kwargs['id']
+        context['food_id'] = food_id
+        return context

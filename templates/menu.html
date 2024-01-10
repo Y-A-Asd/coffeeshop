@@ -171,10 +171,9 @@
 										<h3>{{ food.name }}</h3>
                                         <div class="star-rating" data-rating="{{ food.average_rating|floatformat:0 }}" id="foodRating2"></div>
                                         <p class=""><a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
-                                        <br>
                                         
-                                        <a href="{% url 'foods:submit-review' food.id %}">Submit Review
-                                        </a>
+                                        <h6 class="mt-2"><a href="{% url 'foods:submit-review' food.id %}"> Review
+                                        </a></h6>
 									</div>
 									<div class="one-forth">
 										{% if food.off_percent %}
