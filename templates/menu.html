@@ -101,7 +101,7 @@
                                 <div class="one-half">
                                     <h3>{{ food.name }}</h3><p class="">
 								<a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
-                                    <p>Rating: {{ food.average_rating }} </p>
+                                    <p>Rating: {{ food.average_rating|floatformat }} </p>
                                         <a href="{% url 'foods:submit-review' food.id %}">Submit Review
                                         </a> 
                                 </div>

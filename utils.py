@@ -538,11 +538,11 @@ class Reporting:
             .annotate(
                 used_foods=Sum('orderitem__quantity', distinct=True),
                 total_sales=Sum(
-                    ((F('orderitem__price') * F('orderitem__quantity')) - (
-                            F('orderitem__price') * F('orderitem__quantity') * (
-                        F('orderitem__order__discount')) / 100))
+                    ((F('orderitem__price')* 1.0000000001 * F('orderitem__quantity')) - (
+                            F('orderitem__price')* 1.0000000001 * F('orderitem__quantity') * (
+                        F('orderitem__order__discount')) / 100)),output_field=DecimalField()
                 )
-                # ,output_field=DecimalField()
+
             )
             .select_related('category')
             .order_by('-used_foods')

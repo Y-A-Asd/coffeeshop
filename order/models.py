@@ -29,7 +29,7 @@ class Order(BaseModel):
                                null=True,
                                blank=True,
                                on_delete=models.SET_NULL)
-    discount = models.DecimalField(default=0.0, max_digits=3, decimal_places=2,
+    discount = models.DecimalField(default=0.0, max_digits=5, decimal_places=2,
                                    validators=[MinValueValidator(0),
                                                MaxValueValidator(100)])
 
@@ -63,7 +63,7 @@ class OrderItem(BaseModel):
     order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='items')
     product = models.ForeignKey(Food, on_delete=models.PROTECT)
     price = models.DecimalField(max_digits=10, decimal_places=4)
-    quantity = models.DecimalField(max_digits=5, decimal_places=2, default=1)
+    quantity = models.DecimalField(max_digits=6, decimal_places=2, default=1)
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"

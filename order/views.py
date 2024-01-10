@@ -168,7 +168,7 @@ class OrderAllListView(BaseOrderListView):
 
 class OrderSearchListView(BaseOrderListView):
     def get_queryset(self):
-        customer_phone = self.request.GET.get('customer_phone')
+        customer_phone = self.request.GET.get('label')
         return Order.objects.filter(customer_phone__icontains=customer_phone)
 
 
