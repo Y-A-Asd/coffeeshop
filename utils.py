@@ -427,7 +427,7 @@ class Reporting:
         elif 'start_at' in kwargs and 'end_at' in kwargs:
             print('here too')
             self.start_at = kwargs['start_at']
-            self.end_at = kwargs['end_at']
+            self.end_at = kwargs['end_at'] + timedelta(days=1)
             self.time_filter = Q(created_at__range=[self.start_at, self.end_at])
 
     def total_sales(self):
