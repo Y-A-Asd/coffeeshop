@@ -1,9 +1,12 @@
 import csv
+
+from django.db import models
+
 from offkey.forms import GetOff
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Count, Sum, F
+from django.db.models import Count, Sum, F, ExpressionWrapper, DecimalField
 from django.http import HttpResponse
 from django.views import View
 from django.shortcuts import render, redirect, get_object_or_404
@@ -127,10 +130,14 @@ class BaseOrderListView(CSVExportMixin, StaffSuperuserRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        raise NotImplementedError("Subclasses must implement get_queryset method.")
+        raise NotImplementedError("ssubclasses must implement get_queryset method.")
 
     def get_csv_export_queryset(self):
-        return self.get_queryset()
+        queryset = self.get_queryset()
+        return queryset.annotate(total_cost=models.ExpressionWrapper(
+            models.F('items__price') * models.F('items__quantity') - models.F('discount'),
+            output_field=models.DecimalField(max_digits=10, decimal_places=2)
+        ))
 
     def get_csv_export_filename(self):
         return 'orders_export'

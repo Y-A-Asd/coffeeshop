@@ -473,9 +473,10 @@ class Reporting:
             total_sales=ExpressionWrapper(
                 RoundDecimal(
                     Sum(
-                        RoundDecimal(F('items__price')* 1.0000000001 * F('items__quantity')) -
-                        RoundDecimal(F('items__price')* 1.0000000001 * F('items__quantity') * F('discount') / Decimal('100.0')),
-                            output_field=DecimalField(max_digits=10, decimal_places=4)
+                        RoundDecimal(F('items__price') * 1.0000000001 * F('items__quantity')) -
+                        RoundDecimal(
+                            F('items__price') * 1.0000000001 * F('items__quantity') * F('discount') / Decimal('100.0')),
+                        output_field=DecimalField(max_digits=10, decimal_places=4)
                     )
                 ),
                 output_field=DecimalField(max_digits=10, decimal_places=2)
@@ -538,9 +539,9 @@ class Reporting:
             .annotate(
                 used_foods=Sum('orderitem__quantity', distinct=True),
                 total_sales=Sum(
-                    ((F('orderitem__price')* 1.0000000001 * F('orderitem__quantity')) - (
-                            F('orderitem__price')* 1.0000000001 * F('orderitem__quantity') * (
-                        F('orderitem__order__discount')) / 100)),output_field=DecimalField()
+                    ((F('orderitem__price') * 1.0000000001 * F('orderitem__quantity')) - (
+                            F('orderitem__price') * 1.0000000001 * F('orderitem__quantity') * (
+                        F('orderitem__order__discount')) / 100)), output_field=DecimalField()
                 )
 
             )
@@ -796,10 +797,23 @@ class CSVExportMixin():
         response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
 
         writer = csv.writer(response)
-        headers = [field.name for field in queryset.model._meta.fields]
-        writer.writerow(headers)
+        if queryset.model == Order:
+            headers = [field.name for field in queryset.model._meta.fields]
+            headers.append('total_cost')  # Add total_cost to headers
 
-        for obj in queryset:
-            writer.writerow([str(getattr(obj, field)) for field in headers])
+            writer.writerow(headers)
+
+            for obj in queryset:
+                # Retrieve all model fields and add the total_cost value
+                row_data = [str(getattr(obj, field)) for field in headers[:-1]]
+                row_data.append(round(obj.get_total_cost(), 2))
+                writer.writerow(row_data)
+        else:
+            # For other models, use default behavior
+            headers = [field.name for field in queryset.model._meta.fields]
+            writer.writerow(headers)
+
+            for obj in queryset:
+                writer.writerow([str(getattr(obj, field)) for field in headers])
 
         return response
