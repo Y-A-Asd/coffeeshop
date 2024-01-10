@@ -176,6 +176,12 @@ class UnListView(AllListView):
         return Food.objects.filter(availability=False).select_related('category')
 
 
+class SearchFoodListView(AllListView):
+    def get_queryset(self):
+        food = self.request.GET.get('label')
+        return Food.objects.filter(name__icontains=food)
+
+
 class CategoryFoodsListView(AllListView):
     def get_queryset(self):
         category_id = self.kwargs['category_id']

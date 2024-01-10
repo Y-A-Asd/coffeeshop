@@ -19,5 +19,6 @@ urlpatterns = [
     path('submit-review/<int:id>', views.SubmitReviewView.as_view(), name='submit-review'),
     path('approve-review/<int:id>', views.ApproveReviewView.as_view(), name='approve-review'),
     path('food-review/<int:id>', views.ListReviewsView.as_view(), name='food-review'),
+    path('food-search/', views.SearchFoodListView.as_view(), name='list-food-search'),
 
 ]
