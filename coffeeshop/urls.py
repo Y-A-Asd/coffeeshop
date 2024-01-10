@@ -22,7 +22,6 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('foods/', include('foodmenu.urls', namespace='foods')),
-    path('docP:-/', ),
     path('__debug__/', include('debug_toolbar.urls')),
     path('admin/login/', UsersLoginView.as_view(), ),
     path('admin/', admin.site.urls),

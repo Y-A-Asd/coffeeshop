@@ -28,23 +28,37 @@
               Blogs
             </a>
           </li>
+        {% if user.is_authenticated %}
+        {% if user.is_staff or user.is_superuser %}
           <li class="nav-item">
             <a class="nav-link text-white" href="{% url 'core:dashboard' %}">
               Dashboard
             </a>
           </li>
+        {% else %}
+            <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'order:phone-orders' user.phone_number %}">
+              Dashboard
+            </a>
+          </li>
+        {% endif %}
             <li class="nav-item">
             <a class="nav-link text-white" href="{% url 'foods:list-food' %}">
               Menu
             </a>
           </li>
-            {% if user.is_authenticated %}
+            
        <li class="nav-item">
             <a class="nav-link text-rose" href="{% url 'users:logout' %}">
               Logout
             </a>
           </li>
             {% else %}
+            <li class="nav-item">
+            <a class="nav-link text-white" href="{% url 'foods:list-food' %}">
+              Menu
+            </a>
+          </li>
              <li class="nav-item">
             <a class="nav-link text-rose" href="{% url 'users:login' %}">
               Login
@@ -55,6 +69,7 @@
               Register
             </a>
           </li>
+            
             {% endif %}
             
         </ul>
