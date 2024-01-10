@@ -796,7 +796,9 @@ class CSVExportMixin():
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
 
+        total_cost_sum = Decimal(0)
         writer = csv.writer(response)
+
         if queryset.model == Order:
             headers = [field.name for field in queryset.model._meta.fields]
             headers.append('total_cost')  # Add total_cost to headers
@@ -804,10 +806,15 @@ class CSVExportMixin():
             writer.writerow(headers)
 
             for obj in queryset:
-                # Retrieve all model fields and add the total_cost value
+
                 row_data = [str(getattr(obj, field)) for field in headers[:-1]]
-                row_data.append(round(obj.get_total_cost(), 2))
+                total_cost = round(obj.get_total_cost(), 2)
+                row_data.append(total_cost)
                 writer.writerow(row_data)
+
+                total_cost_sum += total_cost
+
+            writer.writerow(['Total Cost Sum:', '', '', '', '', '', '', '', '', f'{total_cost_sum}'])
         else:
             # For other models, use default behavior
             headers = [field.name for field in queryset.model._meta.fields]
