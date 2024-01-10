@@ -6,11 +6,11 @@ from datetime import timedelta
 from functools import wraps
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db import models
-from django.db.models.functions import ExtractHour, Extract, ExtractWeekDay
+from django.db.models.functions import ExtractHour, Extract, ExtractWeekDay, Round
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.apps import AppConfig
-from django.db.models import Q, Sum, F, ExpressionWrapper, DecimalField, Avg
+from django.db.models import Q, Sum, F, ExpressionWrapper, DecimalField, Avg, Func
 from django.http import HttpResponse
 from decimal import Decimal
 from django.conf import settings
@@ -451,13 +451,43 @@ class Reporting:
             status='F'
         )
 
+        class RoundDecimal(Func):
+            """
+                https://stackoverflow.com/questions/17085898/conversion-of-datetime-field-to-string-in-django-queryset-values-list
+                https://docs.djangoproject.com/en/1.8/ref/models/expressions/
+            """
+            function = 'ROUND'
+            template = '%(function)s(%(expressions)s, 2)'
+
+        # total_sales = orders.aggregate(
+        #     total_sales=ExpressionWrapper(Round(Sum(
+        #         F('items__price') * F('items__quantity') -
+        #         (F('items__price') * F('items__quantity') * F('discount') / Decimal(100.0)),
+        #         output_field=DecimalField(max_digits=10, decimal_places=2)
+        #     ), output_field=DecimalField(max_digits=10, decimal_places=2),precision=2
+        #     ), output_field=DecimalField(max_digits=10, decimal_places=2)
+        #     )
+        # ) or Decimal('0.00')
+
         total_sales = orders.aggregate(
-            total_sales=Sum(
-                F('items__price') * F('items__quantity') -
-                (F('items__price') * F('items__quantity') * F('discount') / Decimal(100.0))
+            total_sales=ExpressionWrapper(
+                RoundDecimal(
+                    Sum(
+                        RoundDecimal(F('items__price')* 1.0000000001 * F('items__quantity')) -
+                        RoundDecimal(F('items__price')* 1.0000000001 * F('items__quantity') * F('discount') / Decimal('100.0')),
+                            output_field=DecimalField(max_digits=10, decimal_places=4)
+                    )
+                ),
+                output_field=DecimalField(max_digits=10, decimal_places=2)
             )
-        )or 0.00
-        """https://www.reddit.com/r/djangolearning/comments/jtvbxn/rounding_an_aggregation_to_2_decimal_places/"""
+        ) or Decimal('0.00')
+
+        """
+        https://www.reddit.com/r/djangolearning/comments/jtvbxn/rounding_an_aggregation_to_2_decimal_places/
+        https://docs.djangoproject.com/en/5.0/ref/models/expressions/#using-f-with-annotations
+        https://docs.djangoproject.com/en/5.0/ref/models/querysets/#sum
+        https://stackoverflow.com/questions/69298226/how-can-i-round-an-sum-in-django-ojbect
+        """
         # if total_sales['total_sales'] :
         #     pass
         # else:
@@ -509,13 +539,18 @@ class Reporting:
                 used_foods=Sum('orderitem__quantity', distinct=True),
                 total_sales=Sum(
                     ((F('orderitem__price') * F('orderitem__quantity')) - (
-                                F('orderitem__price') * F('orderitem__quantity') * (
-                            F('orderitem__order__discount')) / 100))
+                            F('orderitem__price') * F('orderitem__quantity') * (
+                        F('orderitem__order__discount')) / 100))
                 )
+                # ,output_field=DecimalField()
             )
             .select_related('category')
             .order_by('-used_foods')
         )
+
+        print(OrderItem._meta.get_field('price').get_internal_type())
+        print(OrderItem._meta.get_field('quantity').get_internal_type())
+        print(Order._meta.get_field('discount').get_internal_type())
 
         for food in most_used_foods:
             if food.used_foods > 0:
