@@ -24,6 +24,22 @@
 	
 	<link rel="stylesheet" href="{% static 'static/css/flaticon.css' %}">
 	<link rel="stylesheet" href="{% static 'static/css/style.css' %}">
+    <style>
+        .star-rating {
+            font-size: 24px;
+            margin-bottom: 0px;
+        }
+
+        .star-rating span {
+            display: inline-block;
+            margin-right: 0px;
+            color: lightgray; /* default color for empty stars */
+        }
+
+        .star-rating .active {
+            color:#E52B34 ; /* color for filled stars */
+        }
+    </style>
 </head>
 <body class="bg-light">
 
@@ -100,10 +116,13 @@
                             <div class="d-flex">
                                 <div class="one-half">
                                     <h3>{{ food.name }}</h3><p class="">
-								<a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
-                                    <p>Rating: {{ food.average_rating|floatformat }} </p>
-                                        <a href="{% url 'foods:submit-review' food.id %}">Submit Review
-                                        </a> 
+{#                                    <p>Rating: {{ food.average_rating|floatformat }} </p>#}
+{#                                    <div class="star-rating" data-rating="{{ food.average_rating|floatformat:0 }}"></div>#}
+                                    <div class="star-rating" data-rating="{{ food.average_rating|floatformat:0 }}" id="foodRating1"></div>
+                                    <a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
+                                    
+                                        <h6 class="mt-2"><a href="{% url 'foods:submit-review' food.id %}">Review
+                                        </a> </h6>
                                 </div>
                                 <div class="one-forth">
                                     {% if food.off_percent %}
@@ -150,9 +169,10 @@
 								<div class="d-flex">
 									<div class="one-half">
 										<h3>{{ food.name }}</h3>
-                                        <p class="">
-								<a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
-                                    <p>Rating: {{ food.average_rating }} </p>
+                                        <div class="star-rating" data-rating="{{ food.average_rating|floatformat:0 }}" id="foodRating2"></div>
+                                        <p class=""><a href="{% url 'foods:food-review' food.id %}" class="float-right meta-chat"><span class="fa fa-comment"></span> {{ food.reviews_count }}</a></p>
+                                        <br>
+                                        
                                         <a href="{% url 'foods:submit-review' food.id %}">Submit Review
                                         </a>
 									</div>
@@ -287,6 +307,26 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&sensor=false"></script>
 <script src="{% static 'static/js/google-map.js' %}"></script>
 <script src="{% static 'static/js/main.js' %}"></script>
-		
+		<script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const ratings = document.querySelectorAll('.star-rating');
+        
+                ratings.forEach(function (starRating) {
+                    const rating = parseInt(starRating.getAttribute('data-rating'));
+        
+                    for (let i = 1; i <= 5; i++) {
+                        const star = document.createElement('span');
+                        star.innerHTML = '&#9733;'; // Unicode character for a star
+                        star.classList.add('fa');
+        
+                        if (i <= rating) {
+                            star.classList.add('active');
+                        }
+        
+                        starRating.appendChild(star);
+                    }
+                });
+            });
+        </script>
 	</body>
 	</html>
