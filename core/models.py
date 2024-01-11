@@ -19,7 +19,9 @@ class BaseModel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
+    defman = models.Manager()
     objects = SoftDeleteManager()
+
 
     class Meta:
         abstract = True

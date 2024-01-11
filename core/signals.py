@@ -58,10 +58,16 @@ def get_model_changes(old_instance, new_instance):
         new_value = getattr(new_instance, field.name)
 
         if old_value != new_value:
-            changes[field.name] = {
-                'old_value': old_value,
-                'new_value': new_value,
-            }
+            if isinstance(new_value, DateTimeField) or isinstance(old_value, DateTimeField):
+                changes[field.name] = {
+                    'old_value': str(old_value),
+                    'new_value': str(new_value),
+                }
+            else:
+                changes[field.name] = {
+                    'old_value': str(old_value),
+                    'new_value': str(new_value),
+                }
 
     return changes
 

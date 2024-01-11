@@ -583,7 +583,7 @@ class Reporting:
         previous_days_sales = Reporting(reporting_params).total_sales()
 
         if previous_days_sales and current_sales:
-            percentage_difference = ((current_sales - previous_days_sales) / abs(previous_days_sales)) * 100
+            percentage_difference = ((previous_days_sales - current_sales) / abs(previous_days_sales)) * 100
         else:
             if current_sales:
                 percentage_difference = 100

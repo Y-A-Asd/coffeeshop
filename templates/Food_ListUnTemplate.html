@@ -110,6 +110,7 @@
                 <th class="border-gray-200">Total</th>
                 <th class="border-gray-200">Category</th>
                 <th class="border-gray-200">Availability</th>
+                <th class="border-gray-200">Delete</th>
 
             </tr>
             </thead>
@@ -136,7 +137,7 @@
                     {% else %}
                         <td><span class="fw-normal btn btn-reddit">{{ food.availability }}</span></td>
                     {% endif %}
-
+                    <td><span class="fw-normal btn btn-outline-gray-800"><a href="{% url 'foods:delete-food' food.id %}">Delete</a></span></td>
                 </tr>
 
             {% endfor %}
