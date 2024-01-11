@@ -687,7 +687,9 @@ class Reporting:
             )
             .annotate(
                 total_sales=Sum(
-                    F('food__orderitem__quantity') * F('food__orderitem__price'),
+                    F('food__orderitem__quantity') * 1.0000000001 * F('food__orderitem__price')
+                    - F('food__orderitem__quantity') * 1.0000000001 * F('food__orderitem__price') * F(
+                        'food__orderitem__order__discount') / 100, output_field=DecimalField()
                 )
             )
             .order_by('-total_sales')
@@ -722,7 +724,7 @@ class Reporting:
                 status='F',
                 id__in=row_ids
             )
-            .values('id', 'items__price', 'items__quantity')
+            .values('id', 'items__price', 'items__quantity', 'discount')
         )
         # print(audit_logs_dict)
         # print("\n\n\n")
@@ -745,7 +747,7 @@ class Reporting:
                         'total_sales': 0
                     }
                 employee_sales_data[user_phone_number]['order_count'] += 1
-                employee_sales_data[user_phone_number]['total_sales'] += data['items__price'] * data['items__quantity']
+                employee_sales_data[user_phone_number]['total_sales'] += data['items__price'] * data['items__quantity'] - data['items__price'] * data['items__quantity'] * data['discount']/100
 
         result_data = [
             EmployeeSalesData(
@@ -811,7 +813,6 @@ class CSVExportMixin():
             writer.writerow(headers)
 
             for obj in queryset:
-
                 row_data = [str(getattr(obj, field)) for field in headers[:-1]]
                 total_cost = round(obj.get_total_cost(), 2)
                 row_data.append(total_cost)

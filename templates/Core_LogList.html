@@ -107,7 +107,7 @@
                 <th class="border-gray-200">DateTime</th>
                 <th class="border-gray-200">Section</th>
                 <th class="border-gray-200">Field</th>
-                <th class="border-gray-200">Oldvalue</th>
+{#                <th class="border-gray-200">Oldvalue</th>#}
                 <th class="border-gray-200">Chenges</th>
                 <th class="border-gray-200">User</th>
                 <th class="border-gray-200">Retrieve</th>
@@ -124,13 +124,13 @@
                     <td><span class="fw-normal">{{ log.timestamp }}</span></td>
                     <td><span class="fw-normal">{{ log.table_name }}</span></td>
                     <td><span class="fw-normal">{{ log.row_id }}</span></td>
-                    <td><span class="fw-normal">{{ log.old_value }}</span></td>
+{#                    <td><span class="fw-normal">{{ log.old_value }}</span></td>#}
                     <td><span class="fw-normal">{{ log.changes}}</span></td>
                     <td><span class="fw-normal">{{ log.user.phone_number }}</span></td>
                     <td><span class="fw-normal">
                         <form action="{% url 'core:retrieve-changes' log_id=log.id %}" method="post">
                             {% csrf_token %}
-                            <button class="btn btn-outline-gray-800" type="submit">Retrieve Changes</button>
+                            <button class="btn btn-outline-gray-800" type="submit">Retrieve</button>
                         </form>
                     </span></td>
                     
