@@ -259,30 +259,9 @@ class GetPhoneOrderView(StaffSuperuserRequiredMixin, View):
         return render(request, self.template_name, {'form': form})
 
 
-class CustomerOrdersView(CSVExportMixin, StaffSuperuserRequiredMixin, View):
+class CustomerOrdersView(StaffSuperuserRequiredMixin, View):
     template_name = 'Order_ListCustomer.html'
     paginate_by = 10
-
-    def get_csv_export_queryset(self):
-        orders = Order.objects.filter(
-            status='F'
-        )
-        customers_data = (
-            orders
-            .values('customer_phone')
-            .annotate(count=Count('id'),
-                      total=Sum(
-                          F('items__price') * 1.0000000001 * F('items__quantity') - F(
-                              'items__price') * 1.0000000001 * F('items__quantity') * F('discount') / 100,
-                          output_field=DecimalField()
-                      )
-                      )
-            .order_by('-total')
-        )
-        return customers_data
-
-    def get_csv_export_filename(self):
-        return 'orders_export'
 
     def get(self, request):
         orders = Order.objects.filter(
@@ -295,11 +274,13 @@ class CustomerOrdersView(CSVExportMixin, StaffSuperuserRequiredMixin, View):
                       total=Sum(
                           F('items__price') * 1.0000000001 * F('items__quantity') - F(
                               'items__price') * 1.0000000001 * F('items__quantity') * F('discount') / 100,
-                          output_field=DecimalField()
+                          output_field=DecimalField(max_digits=10, decimal_places=2)
                       )
                       )
             .order_by('-total')
         )
+        if 'export_csv' in request.GET:
+            return self.export_csv(customers_data)
 
         paginator = Paginator(customers_data, self.paginate_by)
         page = request.GET.get('page')
@@ -311,3 +292,16 @@ class CustomerOrdersView(CSVExportMixin, StaffSuperuserRequiredMixin, View):
         except EmptyPage:
             customers_data = paginator.page(paginator.num_pages)
         return render(request, self.template_name, {'customer_orders': customers_data})
+
+    def export_csv(self, queryset):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="customer_orders.csv"'
+
+        writer = csv.writer(response)
+        headers = ['customer_phone', 'count', 'total']
+        writer.writerow(headers)
+
+        for row in queryset:
+            writer.writerow([str(row[field]) for field in headers])
+
+        return response

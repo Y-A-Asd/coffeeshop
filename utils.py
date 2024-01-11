@@ -572,22 +572,23 @@ class Reporting:
     def get_percentage_difference(self):
         """
         Calculate the percentage difference between the current time frame and the previous one.
-        For instance, if self.days is 2, it will compare the last 2 days with the 2 days before that.
+        For instance, if self.days is 2, it will compare the last 2 days with the 2 days before that. :-)
         """
         current_sales = self.total_sales()
         try:
             reporting_params = {'days': self.days * 2}
         except AttributeError:
             return 0
+
         previous_days_sales = Reporting(reporting_params).total_sales()
-        # print(current_sales, previous_days_sales)
-        if previous_days_sales:
-            if current_sales:
-                percentage_difference = ((current_sales - previous_days_sales) / previous_days_sales) * 100
-            else:
-                percentage_difference = ((0 - previous_days_sales) / previous_days_sales) * 100
+
+        if previous_days_sales and current_sales:
+            percentage_difference = ((current_sales - previous_days_sales) / abs(previous_days_sales)) * 100
         else:
-            percentage_difference = current_sales * 100
+            if current_sales:
+                percentage_difference = 100
+            else:
+                percentage_difference = 0
 
         return percentage_difference
 
@@ -813,6 +814,7 @@ class CSVExportMixin():
             writer.writerow(headers)
 
             for obj in queryset:
+                print(obj)
                 row_data = [str(getattr(obj, field)) for field in headers[:-1]]
                 total_cost = round(obj.get_total_cost(), 2)
                 row_data.append(total_cost)
