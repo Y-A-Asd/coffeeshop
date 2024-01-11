@@ -108,6 +108,9 @@
                                 <tr>
                                     <td>{{ product.name }}</td>
                                     <td>
+{#                                        {{ key }}#}
+{#                                        {{ key }}#}
+{#                                        {{ key }}#}
                                         <form action="{% url "order:create-cart" product.id %}" method="post">
                                             {{ item.update_quantity_form.quantity }}
                                             {{ item.update_quantity_form.override }}

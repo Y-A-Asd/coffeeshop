@@ -164,19 +164,19 @@
                 </td>
             </tr>
             <tr>
-                <td class="flex justify-content-center">
-                    <div class="flex col-4 col-md-2 col-xl-1 ps-md-0 text-end">
-                        {% for table_id , order in table_orders.items %}
-                            {% if table_id == table_instance.id %}
-                                {% for orders in order %}
-                                    <p>Order-Status: {{ orders.get_status_display }}
-                                        - Date/Time: {{ orders.created_at }}</p>
-                                {% endfor %}
-                            {% endif %}
+        <td class="flex justify-content-center">
+            <div class="flex col-4 col-md-2 col-xl-1 ps-md-0 text-end">
+                {% for table_id, order in table_orders.items %}
+                    {% if table_id == table_instance.id %}
+                        {% for orders in order %}
+                            <p>Order-Status: {{ orders.get_status_display }}
+                                - Date/Time: {{ orders.created_at }}</p>
                         {% endfor %}
-
-                    </div>
-            </tr>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </td>
+    </tr>
         {% endfor %}
         </tbody>
     </table>

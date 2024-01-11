@@ -133,11 +133,18 @@
                     <td><span class="fw-normal">{{ food.price_after_off }}</span></td>
                     <td><span class="fw-normal"><a href="{% url 'foods:update-category' food.category.id %}">{{ food.category.name }}</a></span></td>
                     {% if food.availability %}
-                        <td><span class="fw-normal btn btn-info">{{ food.availability }}</span></td>
+                        <td class="mx-5"><span class="fw-normal  text-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="green" class="icon icon-sm  text-center">
+  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+</svg>
+</span></td>
                     {% else %}
-                        <td><span class="fw-normal btn btn-reddit">{{ food.availability }}</span></td>
+                        <td class="ml-3"><span class="fw-normal text-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="red" class="icon icon-sm text-center">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+</svg>
+
+</span></td>
                     {% endif %}
-                    <td><span class="fw-normal btn btn-outline-gray-800"><a href="{% url 'foods:delete-food' food.id %}">Delete</a></span></td>
+                    <td ><span class="fw-normal btn btn-outline-gray-800"><a href="{% url 'foods:delete-food' food.id %}">Delete</a></span></td>
                 </tr>
 
             {% endfor %}

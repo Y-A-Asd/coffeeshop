@@ -1,3 +1,4 @@
+import datetime
 from decimal import Decimal
 from core.models import AuditLog
 from django.dispatch import receiver
@@ -60,15 +61,19 @@ def get_model_changes(old_instance, new_instance):
         new_value = getattr(new_instance, field.name)
 
         if old_value != new_value:
-            if isinstance(new_value, DateTimeField) or isinstance(old_value, DateTimeField):
+            if isinstance(new_value, DateTimeField) or isinstance(old_value, DateTimeField) \
+                    or isinstance(new_value, Decimal) or isinstance(old_value, Decimal)\
+                    or isinstance(new_value, datetime.datetime) or isinstance(old_value, datetime.datetime)\
+                    or isinstance(new_value, uuid.UUID) or isinstance(old_value, uuid.UUID)\
+                    :
                 changes[field.name] = {
                     'old_value': str(old_value),
                     'new_value': str(new_value),
                 }
             else:
                 changes[field.name] = {
-                    'old_value': str(old_value),
-                    'new_value': str(new_value),
+                    'old_value': old_value,
+                    'new_value': new_value,
                 }
 
     return changes

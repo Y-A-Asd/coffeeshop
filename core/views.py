@@ -109,7 +109,8 @@ class RetrieveChangesView(SuperuserRequiredMixin, View):
         if log_entry.changes:
             for field_name, field_data in log_entry.changes.items():
                 setattr(model_instance, field_name, field_data['old_value'])
-
+                if model_instance.deleted_at =="None":
+                    model_instance.deleted_at = None
             model_instance.save()
 
             AuditLog.objects.create(

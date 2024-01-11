@@ -1,4 +1,6 @@
 import csv
+import json
+
 from offkey.models import Offkey
 from abc import ABC, abstractmethod
 from collections import namedtuple
@@ -319,6 +321,7 @@ class Cart:
         Initialize the cart.
         """
         self.session = request.session
+        self.request= request
         cart = self.session.get(settings.CART_SESSION_ID)
         if not cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
@@ -358,7 +361,11 @@ class Cart:
         Iterate over the items in the cart and get the products
         from the database.
         """
-
+        # self.cart =  json.loads(self.cart)
+        # del self.request.session
+        # self.cart =  eval(self.cart)
+        print(self.cart)
+        print(type(self.cart))
         product_ids = self.cart.keys()
         # get the product objects and add them to the cart
         products = Food.objects.filter(id__in=product_ids)
@@ -366,7 +373,8 @@ class Cart:
         for product in products:
             cart[str(product.id)]['product'] = product
         for item in cart.values():
-            item['price'] = Decimal(item['price'])
+            # item['price'] = Decimal(item['price'])
+            # item['quantity'] = Decimal(item['quantity'])
             item['total_price'] = item['price'] * item['quantity']
             yield item
 

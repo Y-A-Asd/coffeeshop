@@ -93,7 +93,6 @@ class ListReservationView(LoginRequiredMixin, View):
 class DetailReservationView(View):
     template_name = 'Reservation_DetailTemplate.html'
 
-    @staff_or_superuser_required
     def get(self, request, pk):
         tables = Table.objects.all()
         try:
@@ -201,21 +200,23 @@ class ListTableView(StaffSuperuserRequiredMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # context['table_orders'] = {}
-        # for table_instance in context['table']:
-        #     try:
-        #         order = Order.objects.filter(table=table_instance, status__in=["W", "P", "T"])
-        #         context['table_orders'][table_instance.id] = order
-        #     except Order.DoesNotExist:
-        #         pass
+        context['table_orders'] = {}
+        for table_instance in context['table']:
+            try:
+                order = Order.objects.filter(table=table_instance, status__in=["W", "P", "T"])
+                context['table_orders'][table_instance.id] = order
+            except Order.DoesNotExist:
+                pass
 
         table_ids = [table.id for table in context['table']]
 
-        orders_dict = Order.objects.filter(
-            deleted_at__isnull=True,
-            status__in=["W", "P", "T"],
-            table_id__in=table_ids
-        ).order_by('-created_at').in_bulk(field_name='id')
+        # orders_dict = Order.objects.filter(
+        #     deleted_at__isnull=True,
+        #     status__in=["W", "P", "T"],
+        #     table_id__in=table_ids
+        # ).order_by('-created_at').in_bulk(field_name='table_id')
+
+        # print(orders_dict)
         """
         
         in_bulk():
@@ -229,8 +230,8 @@ class ListTableView(StaffSuperuserRequiredMixin, ListView):
               field_name defaults to the primary key.
               
         """
-        context['table_orders'] = {table.id: orders_dict.get(table.id, []) for table in context['table']}
-
+        # context['table_orders'] = {table.id: orders_dict.get(table.id) for table in context['table']}
+        print(context['table_orders'])
         return context
 
 
