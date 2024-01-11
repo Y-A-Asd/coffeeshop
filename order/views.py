@@ -38,7 +38,7 @@ class CreateCartView(View):
 
 
 class DeleteCartView(View):
-    @staff_or_superuser_required
+    # @staff_or_superuser_required
     def post(self, request, product_id):
         cart = Cart(request)
         product = get_object_or_404(Food, id=product_id)

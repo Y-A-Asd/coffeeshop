@@ -34,7 +34,7 @@ class AuditLog(models.Model):
     """
     django-simple-history is a joke !
     """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True , default=None)
     action = models.CharField(max_length=10)  # 'CREATE', 'UPDATE', 'DELETE'
     timestamp = models.DateTimeField(auto_now_add=True)
     table_name = models.CharField(max_length=50)

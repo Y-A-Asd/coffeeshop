@@ -14,6 +14,8 @@ from django.db.models.fields import DateTimeField
 import uuid
 import inspect
 
+from users.models import User
+
 """ 
    ________________________________________________________________________________
   |                   IF WE WANT TO ADD USER INTO DATABASE                         |    
@@ -112,6 +114,8 @@ def log_create_update(sender, instance, **kwargs):
 
     if request:
         user = request.user
+        if not isinstance(user, User):
+            user = None
     else:
         user = None
 
@@ -155,7 +159,10 @@ def log_delete(sender, instance, **kwargs):
 
     if request:
         user = request.user
-    else: user = None
+        if not isinstance(user, User):
+            user = None
+    else:
+        user = None
 
     old_value = serialize_model_instance(instance)
 
