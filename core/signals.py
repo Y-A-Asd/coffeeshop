@@ -2,8 +2,9 @@ from decimal import Decimal
 from core.models import AuditLog
 from django.dispatch import receiver
 from django.contrib.sessions.models import Session
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, pre_save
 from foodmenu.models import Food,Category
+from offkey.models import Offkey
 from tag.models import Tag,TaggedItem
 from tables.models import Table, Reservation
 from order.models import Order, OrderItem
@@ -50,24 +51,42 @@ def serialize_model_instance(instance):
     return fields
 
 
-@receiver(post_save, sender=Food)
-@receiver(post_save, sender=Category)
-@receiver(post_save, sender=Tag)
-@receiver(post_save, sender=TaggedItem)
-@receiver(post_save, sender=Table)
-@receiver(post_save, sender=Reservation)
-@receiver(post_save, sender=Reservation)
-@receiver(post_save, sender=Order)
-def log_create_update(sender, instance, created, **kwargs):
+def get_model_changes(old_instance, new_instance):
+    changes = {}
+    for field in old_instance._meta.fields:
+        old_value = getattr(old_instance, field.name)
+        new_value = getattr(new_instance, field.name)
+
+        if old_value != new_value:
+            changes[field.name] = {
+                'old_value': old_value,
+                'new_value': new_value,
+            }
+
+    return changes
+
+
+@receiver(pre_save, sender=Food)
+@receiver(pre_save, sender=Offkey)
+@receiver(pre_save, sender=Category)
+@receiver(pre_save, sender=Tag)
+@receiver(pre_save, sender=TaggedItem)
+@receiver(pre_save, sender=Table)
+@receiver(pre_save, sender=Reservation)
+@receiver(pre_save, sender=Order)
+def log_create_update(sender, instance, **kwargs):
     model_name = sender.__name__  #just for fun :-|
 
-
-    if created:
+    try:
+        old_instance = sender._default_manager.get(pk=instance.pk) #:-)
+    except sender.DoesNotExist:
         action = 'CREATE'
         old_value = None
+        changes = None
     else:
         action = 'UPDATE'
-        old_value = serialize_model_instance(instance)
+        old_value = serialize_model_instance(old_instance)
+        changes = get_model_changes(old_instance, instance)
 
     table_name = sender._meta.db_table
     row_id = instance.id
@@ -96,6 +115,7 @@ def log_create_update(sender, instance, created, **kwargs):
         table_name=table_name,
         row_id=row_id,
         old_value=old_value,
+        changes=changes,
     )
 
 @receiver(pre_delete, sender=Food)
@@ -103,7 +123,7 @@ def log_create_update(sender, instance, created, **kwargs):
 @receiver(pre_delete, sender=Tag)
 @receiver(pre_delete, sender=TaggedItem)
 @receiver(pre_delete, sender=Table)
-@receiver(pre_delete, sender=Reservation)
+@receiver(pre_delete, sender=Offkey)
 @receiver(pre_delete, sender=Reservation)
 @receiver(pre_delete, sender=Order)
 def log_delete(sender, instance, **kwargs):
@@ -139,4 +159,5 @@ def log_delete(sender, instance, **kwargs):
         table_name=table_name,
         row_id=row_id,
         old_value=old_value,
+        changes=None
     )

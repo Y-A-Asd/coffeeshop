@@ -179,6 +179,11 @@ def is_parent(category):
     return subcategory_query or category.parent is None
 
 
+class SuperuserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_superuser
+
+
 class StaffSuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_staff or self.request.user.is_superuser

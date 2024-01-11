@@ -29,9 +29,13 @@ class BaseModel(models.Model):
         self.save()
 
 class AuditLog(models.Model):
+    """
+    django-simple-history is a joke !
+    """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     action = models.CharField(max_length=10)  # 'CREATE', 'UPDATE', 'DELETE'
     timestamp = models.DateTimeField(auto_now_add=True)
     table_name = models.CharField(max_length=50)
     row_id = models.TextField()
     old_value = models.JSONField(null=True)
+    changes = models.JSONField(null=True)

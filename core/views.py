@@ -1,8 +1,12 @@
 from datetime import datetime
 
-from django.shortcuts import render
+from django.apps import apps
+from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
-from utils import Reporting, staff_or_superuser_required
+from django.views.generic import ListView
+from .models import AuditLog
+from utils import Reporting, staff_or_superuser_required, SuperuserRequiredMixin
 from decimal import Decimal
 
 
@@ -73,3 +77,52 @@ class DashboardView(View):
 #     return render(request, '_build/html/index.html')
 def about_us(request):
   return render(request, 'templates/pages/about-us.html')
+
+
+class LogListView(SuperuserRequiredMixin, ListView):
+    model = AuditLog
+    template_name = 'Core_LogList.html'
+    context_object_name = 'logs'
+    ordering = ['-timestamp']
+    paginate_by = 15
+
+
+class RetrieveChangesView(SuperuserRequiredMixin, View):
+    # todo: make it revert all changes until checkpoint
+    # todo: make it revert all changes until checkpoint
+    # todo: make it revert all changes until checkpoint
+    # todo: make it revert all changes until checkpoint
+    # todo: make it revert all changes until checkpoint
+    # todo: make it revert all changes until checkpoint
+    # todo: make it revert all changes until checkpoint
+    def post(self, request, *args, **kwargs):
+        log_id = self.kwargs['log_id']
+        log_entry = get_object_or_404(AuditLog, id=log_id)
+
+        app_name, model_name = log_entry.table_name.split('_')
+
+        # mage mishe inghadar ziba bashe ?? :-)
+
+        model_class = apps.get_model(app_label=app_name, model_name=model_name)
+
+        model_instance = get_object_or_404(model_class, id=log_entry.row_id)
+        if log_entry.changes:
+            for field_name, field_data in log_entry.changes.items():
+                setattr(model_instance, field_name, field_data['old_value'])
+
+            model_instance.save()
+
+            AuditLog.objects.create(
+                user=request.user,
+                action='RETRIEVE',
+                table_name=log_entry.table_name,
+                row_id=log_entry.row_id,
+                old_value=log_entry.old_value,
+                changes=None
+            )
+            messages.success(request, "Changes reverted successfully.")
+            return redirect('core:logs')
+
+        else:
+            messages.success(request, "No changes to revert.")
+            return redirect('core:logs')
