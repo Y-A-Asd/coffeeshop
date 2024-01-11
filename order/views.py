@@ -272,7 +272,9 @@ class CustomerOrdersView(CSVExportMixin, StaffSuperuserRequiredMixin, View):
             .values('customer_phone')
             .annotate(count=Count('id'),
                       total=Sum(
-                          F('items__price') * F('items__quantity'),
+                          F('items__price') * 1.0000000001 * F('items__quantity') - F(
+                              'items__price') * 1.0000000001 * F('items__quantity') * F('discount') / 100,
+                          output_field=DecimalField()
                       )
                       )
             .order_by('-total')
@@ -291,7 +293,9 @@ class CustomerOrdersView(CSVExportMixin, StaffSuperuserRequiredMixin, View):
             .values('customer_phone')
             .annotate(count=Count('id'),
                       total=Sum(
-                          F('items__price') * F('items__quantity'),
+                          F('items__price') * 1.0000000001 * F('items__quantity') - F(
+                              'items__price') * 1.0000000001 * F('items__quantity') * F('discount') / 100,
+                          output_field=DecimalField()
                       )
                       )
             .order_by('-total')
