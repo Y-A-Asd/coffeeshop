@@ -338,9 +338,9 @@ class Cart:
             self.cart[product_id] = {'quantity': 0,
                                      'price': str(product.price_after_off)}
         if override_quantity:
-            self.cart[product_id]['quantity'] = quantity
+            self.cart[product_id]['quantity'] = int(quantity)
         else:
-            self.cart[product_id]['quantity'] += quantity
+            self.cart[product_id]['quantity'] += int(quantity)
         self.save()
 
     def save(self):
@@ -375,7 +375,7 @@ class Cart:
         for item in cart.values():
             # item['price'] = Decimal(item['price'])
             # item['quantity'] = Decimal(item['quantity'])
-            item['total_price'] = item['price'] * item['quantity']
+            item['total_price'] = Decimal(item['price']) * Decimal(item['quantity'])
             yield item
 
     def __len__(self):
@@ -390,19 +390,27 @@ class Cart:
 
     def clear(self):
         # remove cart from session
+
+        print('start clear')
         del self.session[settings.CART_SESSION_ID]
         self.save()
 
     def edit_orders(self, order_id):
         self.cart.clear()
+        print('done clear')
         products = OrderItem.objects.filter(order_id=order_id)
+        print('done get product')
         for product in products:
             self.add(product=product.product,
                      quantity=product.quantity,
                      override_quantity=True)
+        print('done add product')
         order = Order.objects.get(pk=order_id)
+        print('done get order product')
         order.status = "C"
         order.save()
+        self.save()
+        print('done save order product')
 
     @property
     def offkey(self):
