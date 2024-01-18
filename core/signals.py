@@ -36,7 +36,7 @@ from users.models import User
 def serialize_model_instance(instance):
     fields = {}
     for field in instance._meta.fields:
-        print(field)
+        # print(field)
         field_value = getattr(instance, field.name)
         if isinstance(field, DateTimeField):
             field_value = field_value.isoformat() if field_value else None
@@ -49,6 +49,7 @@ def serialize_model_instance(instance):
         elif isinstance(field_value, uuid.UUID):
             field_value = str(field_value)
 
+
         fields[field.name] = field_value
 
     return fields
@@ -59,18 +60,30 @@ def get_model_changes(old_instance, new_instance):
     for field in old_instance._meta.fields:
         old_value = getattr(old_instance, field.name)
         new_value = getattr(new_instance, field.name)
-
+        # print(type(old_value) , type(new_value),
+        #       isinstance(old_value, ForeignKey),isinstance(old_value, Category),
+        #       isinstance(field, ForeignKey),isinstance(field, Category)
+        #
+        #       )
         if old_value != new_value:
             if isinstance(new_value, DateTimeField) or isinstance(old_value, DateTimeField) \
                     or isinstance(new_value, Decimal) or isinstance(old_value, Decimal)\
                     or isinstance(new_value, datetime.datetime) or isinstance(old_value, datetime.datetime)\
-                    or isinstance(new_value, uuid.UUID) or isinstance(old_value, uuid.UUID)\
+                    or isinstance(new_value, uuid.UUID)\
                     :
+                # print('dome')
                 changes[field.name] = {
                     'old_value': str(old_value),
                     'new_value': str(new_value),
                 }
+            elif isinstance(field, ForeignKey):
+                # print('herealskdjkl;dsjf')
+                changes[field.name] = {
+                    'old_value': old_value.pk,
+                    'new_value': new_value.pk,
+                }
             else:
+                # print('dsakjhsd;kgjhaaaaaaaaaaaaaaaaaaaaa')
                 changes[field.name] = {
                     'old_value': old_value,
                     'new_value': new_value,
@@ -100,6 +113,8 @@ def log_create_update(sender, instance, **kwargs):
         action = 'UPDATE'
         old_value = serialize_model_instance(old_instance)
         changes = get_model_changes(old_instance, instance)
+        # print(old_value)
+        # print(changes)
 
     table_name = sender._meta.db_table
     row_id = instance.id
