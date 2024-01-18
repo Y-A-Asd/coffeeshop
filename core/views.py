@@ -1,14 +1,15 @@
 from datetime import datetime
-
 from django.apps import apps
 from django.contrib import messages
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.views.generic import ListView
+
+from foodmenu.models import Category, Food
 from .models import AuditLog
 from utils import Reporting, staff_or_superuser_required, SuperuserRequiredMixin
 from decimal import Decimal
-
+from django.db.models.fields.related import ForeignKey
 
 # Create your views here.
 class HomeView(View):
@@ -30,7 +31,6 @@ class DashboardView(View):
 
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
-
 
         selected_range = request.GET.get('range', 'month')
 
@@ -73,10 +73,11 @@ class DashboardView(View):
 
         return render(request, self.template_name, context=context)
 
+
 # def document(request):
 #     return render(request, '_build/html/index.html')
 def about_us(request):
-  return render(request, 'templates/pages/about-us.html')
+    return render(request, 'templates/pages/about-us.html')
 
 
 class LogListView(SuperuserRequiredMixin, ListView):
@@ -88,16 +89,15 @@ class LogListView(SuperuserRequiredMixin, ListView):
 
 
 class RetrieveChangesView(SuperuserRequiredMixin, View):
-    # todo: make it revert all changes until checkpoint
-    # todo: make it revert all changes until checkpoint
-    # todo: make it revert all changes until checkpoint
-    # todo: make it revert all changes until checkpoint
-    # todo: make it revert all changes until checkpoint
-    # todo: make it revert all changes until checkpoint
-    # todo: make it revert all changes until checkpoint
+    # todo: make it revert all changes until checkpoint :-)
+    # todo: make it revert all changes until checkpoint :-)
+    # todo: make it revert all changes until checkpoint :-)
+    # todo: make it revert all changes until checkpoint :-)
+    # todo: make it revert all changes until checkpoint :-)
     def post(self, request, *args, **kwargs):
         log_id = self.kwargs['log_id']
         log_entry = get_object_or_404(AuditLog, id=log_id)
+        after_log = AuditLog.objects.all().filter(row_id=log_entry.row_id, timestamp__gte=log_entry.timestamp)
 
         app_name, model_name = log_entry.table_name.split('_')
 
@@ -106,24 +106,58 @@ class RetrieveChangesView(SuperuserRequiredMixin, View):
         model_class = apps.get_model(app_label=app_name, model_name=model_name)
 
         model_instance = get_object_or_404(model_class, id=log_entry.row_id)
-        if log_entry.changes:
-            for field_name, field_data in log_entry.changes.items():
-                setattr(model_instance, field_name, field_data['old_value'])
-                if model_instance.deleted_at =="None":
-                    model_instance.deleted_at = None
-            model_instance.save()
+        changes = {}
+        for log in after_log:
 
-            AuditLog.objects.create(
-                user=request.user,
-                action='RETRIEVE',
-                table_name=log_entry.table_name,
-                row_id=log_entry.row_id,
-                old_value=log_entry.old_value,
-                changes=None
-            )
-            messages.success(request, "Changes reverted successfully.")
-            return redirect('core:logs')
+            if log.changes:
+                for field_name, field_data in log.changes.items():
+                    """https://stackoverflow.com/questions/20081924/how-to-get-field-type-string-from-db-model-in-django"""
+                    # print(model_instance._meta.get_field(field_name))
+                    # print(model_instance._meta.fields)
+                    # print(model_instance._meta.get_field(field_name).get_internal_type == ForeignKey)
+                    # print(model_instance._meta.get_field(field_name).get_internal_type == Category)
+                    # print(model_instance._meta.get_field(field_name).get_internal_type)
+                    # print(dir(model_instance._meta.get_field(field_name).get_internal_type))
+                    # print(type(model_instance._meta.get_field(field_name).get_internal_type))
+                    # print(model_instance._meta.get_field(field_name) == ForeignKey)
+                    # print(model_instance._meta.get_field(field_name) == Category)
+                    # print(model_instance._meta.get_field(field_name))
+                    # print(isinstance(model_instance._meta.get_field(field_name),Category))
+                    # print(isinstance(model_instance._meta.get_field(field_name),ForeignKey))
+                    # print(dir(model_instance._meta.get_field(field_name)))
+                    # print(type(model_instance._meta.get_field(field_name)))
+                    # print(model_instance._meta.get_field(field_name).related_model)
+                    # print(model_instance._meta.get_field(field_name).related_model == Category)
+                    # print(model_instance._meta.get_field(field_name).related_model == Food)
+                    # print(isinstance(model_instance._meta.get_field(field_name).related_model,Category))
+                    # print(type(model_instance._meta.get_field(field_name).related_model))
+                    if isinstance(model_instance._meta.get_field(field_name),ForeignKey):
+                        print('here')
+                        print(field_data)
+                        field_data['old_value'] = model_instance._meta.get_field(field_name).related_model.objects.get(pk=(field_data['old_value']))
+                        print(field_data)
 
-        else:
-            messages.success(request, "No changes to revert.")
-            return redirect('core:logs')
+                    setattr(model_instance, field_name, field_data['old_value'])
+                    if model_instance.deleted_at == "None":
+                        model_instance.deleted_at = None
+
+                model_instance.save()
+                changes[field_name] = str(field_data)
+            # log.delete()todo idk i should delete it or no
+
+
+
+        # AuditLog.objects.create(
+        #     user=request.user,
+        #     action='RETRIEVE',
+        #     table_name=log_entry.table_name,
+        #     row_id=log_entry.row_id,
+        #     old_value=log_entry.old_value,
+        #     changes=changes
+        # )
+        messages.success(request, "Changes reverted successfully.")
+        return redirect('core:logs')
+
+    # else:
+    #     messages.success(request, "No changes to revert.")
+    #     return redirect('core:logs')
