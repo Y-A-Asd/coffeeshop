@@ -1,6 +1,6 @@
 # Maktab102 CafeShop G3
 
-🌟 Welcome to Maktab102 CafeShop Adventure: The Quest for the Ultimate Django Fullstack Project! 🌟
+🌟 Welcome to My CafeShop Adventure: The Quest for the Ultimate Django Fullstack Project! 🌟
 
 ## Project Overview
 
